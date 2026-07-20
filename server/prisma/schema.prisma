@@ -4,10 +4,56 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  email     String   @unique
+  firstName String
+  lastName  String
+  role      Role     @default(USER)
+  password  String
+  updatedAt DateTime @updatedAt
+  folders   Folder[]
+  files     File[]
+}
+
+model Folder {
+  id         String   @id @default(uuid())
+  folderName String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdBy  User     @relation(fields: [userId], references: [id])
+  userId     String
+  files      File[]
+  parentId   String?
+  parent     Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children   Folder[] @relation("FolderHierarchy")
+
+  @@unique([userId, parentId, folderName])
+}
+
+model File {
+  id          String   @id @default(uuid())
+  fileName    String
+  uploadedAt  DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  uploadedBy  User     @relation(fields: [userId], references: [id])
+  userId      String
+  folder      Folder   @relation(fields: [folderId], references: [id])
+  folderId    String
+  mimeType    String
+  storagePath String
+  publicUrl   String?
 }

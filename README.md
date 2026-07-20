@@ -1,99 +1,188 @@
-# Full-Stack Monorepo Template
+# Cloud Storage --- Project Documentation
 
-A GitHub-ready starter repository with a React client and an Express server.
+## Overview
 
-## Repository structure
+Cloud Storage is a full-stack file management application that allows
+authenticated users to organize, upload, manage, and share files.
+
+The project is built using a React frontend and an Express backend with
+Prisma ORM and PostgreSQL. Authentication is session-based using
+Passport.js.
+
+The application begins by storing uploaded files locally during
+development and later transitions to cloud storage for production.
+
+## Tech Stack
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router
+
+### Backend
+
+- Express
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- Passport.js
+- express-session
+- connect-pg-simple
+- Multer
+
+### Storage
+
+- Development: Supabase Storage
+- Production: Supabase Storage
+
+## Core Features
+
+- User registration and login
+- Session-based authentication
+- Folder CRUD
+- File upload
+- File download
+- File deletion
+- File metadata
+- Cloud storage integration
+- Folder sharing with expiring links
+
+## Development Roadmap
+
+### Phase 1
+
+- [x] Project setup
+- [x] Express
+- [x] Prisma
+- [x] Passport
+- [x] Session authentication
+
+### Phase 2
+
+- [x] User model
+- [x] Folder model
+- [x] File model
+
+### Phase 3
+
+- [ ] Folder CRUD
+
+### Phase 4
+
+- [ ] Local uploads with Multer
+
+### Phase 5
+
+- [ ] File management
+
+### Phase 6
+
+- [ ] Validation
+
+### Phase 7
+
+- [ ] Supabase integration
+
+### Phase 8
+
+- [ ] Folder sharing
+
+## Suggested Server Structure
 
 ```text
-.
-├── client/   # React, TypeScript, Vite, and Tailwind CSS
-└── server/   # Express, Prisma, and PostgreSQL
+server
+├── config
+│   ├── passport.ts
+│   ├── prisma.ts
+│   └── multer.ts
+├── controllers
+├── middleware
+├── prisma
+├── routes
+├── uploads
+└── generated
 ```
 
-The client and server are separate npm projects. Install and run them from their respective directories.
+## Database Models
 
-## Prerequisites
+### User
 
-- Node.js and npm
-- PostgreSQL, either locally or from a hosted provider
+- id
+- username
+- password
+- createdAt
 
-## Setup
+### Folder
 
-1. Clone the repository and enter it:
+- id
+- name
+- createdAt
+- updatedAt
+- ownerId
 
-   ```bash
-   git clone <repository-url>
-   cd fullstack-monorepo-template
-   ```
+### File
 
-2. Install the client dependencies:
+- id
+- originalName
+- filename
+- mimeType
+- size
+- url
+- createdAt
+- folderId
 
-   ```bash
-   cd client
-   npm ci
-   cd ..
-   ```
+### Share (Optional)
 
-3. Install the server dependencies:
+- id
+- token
+- expiresAt
+- folderId
 
-   ```bash
-   cd server
-   npm ci
-   ```
+## Routes
 
-4. Create `server/.env` and add the server configuration:
+### Authentication
 
-   ```env
-   DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?schema=public"
-   PORT=3000
-   ORIGIN="http://localhost:5173"
-   ```
-
-5. Generate the Prisma client:
-
-   ```bash
-   npx prisma generate
-   cd ..
-   ```
-
-Keep `.env` out of version control. If the Prisma schema gains database models, create and apply a development migration from `server/` with `npx prisma migrate dev`.
-
-## Start the application
-
-Run the server in one terminal:
-
-```bash
-cd server
-npm run dev
+```http
+POST /register
+POST /login
+POST /logout
 ```
 
-Run the client in a second terminal:
+### Folders
 
-```bash
-cd client
-npm run dev
+```http
+GET    /folders
+GET    /folders/:id
+POST   /folders
+PATCH  /folders/:id
+DELETE /folders/:id
 ```
 
-By default:
+### Files
 
-- Client: `http://localhost:5173`
-- Server: `http://localhost:3000`
-
-## Production commands
-
-Build and preview the client:
-
-```bash
-cd client
-npm run build
-npm run preview
+```http
+POST   /folders/:id/files
+GET    /files/:id
+GET    /files/:id/download
+DELETE /files/:id
 ```
 
-Start the server without file watching:
+### Sharing
 
-```bash
-cd server
-npm start
+```http
+POST /folders/:id/share
+GET  /share/:token
 ```
 
-See [client/README.md](client/README.md) and [server/README.md](server/README.md) for package-specific details.
+## Future Improvements
+
+- Drag-and-drop uploads
+- Multiple file uploads
+- Search
+- Image previews
+- Storage dashboard
+- User quotas
+- Activity log
