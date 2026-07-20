@@ -1,0 +1,24 @@
+# Root-level build and tooling caches
+.turbo/
+.nx/
+.pnpm-store/
+node_modules/
+
+# Package-specific build outputs (Applied globally via unanchored paths)
+dist/
+build/
+.next/
+.out/
+out/
+coverage/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# IDEs and System files
+.id/
+.vscode/
+.DS_Store
+Thumbs.db
