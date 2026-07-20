@@ -5,9 +5,12 @@ import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import connectPgSimple from 'connect-pg-simple';
 import pool from './prisma/Pool.js';
+import client from './config/supabase.config.js';
+import { test } from './test.js';
+
 const pgStore = new connectPgSimple(session);
 const app = express();
-
+test();
 app.use(
     session({
         store: new pgStore({ pool, createTableIfMissing: true }),
