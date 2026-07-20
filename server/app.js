@@ -5,12 +5,12 @@ import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import connectPgSimple from 'connect-pg-simple';
 import pool from './prisma/Pool.js';
-import client from './config/supabase.config.js';
-import { test } from './test.js';
-
+import uploadFile from './service/storage.js';
+import multer from 'multer';
 const pgStore = new connectPgSimple(session);
 const app = express();
-test();
+const sotrage = new multer.memoryStorage();
+const upload = multer({ sotrage: sotrage });
 app.use(
     session({
         store: new pgStore({ pool, createTableIfMissing: true }),
@@ -33,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (_, res) => {
     res.send('hello world');
 });
+app.post('/', upload.single('file'), uploadFile);
 
 app.use((err, req, res, next) => {
     console.error(err);
