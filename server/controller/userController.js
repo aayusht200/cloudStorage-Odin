@@ -1,4 +1,4 @@
-import prisma from '../prisma/Connection.js';
+import prisma from '../config/Connection.js';
 import passport from 'passport';
 import bcrypt from 'bcrypt';
 const getUserById = async (req, res, next) => {

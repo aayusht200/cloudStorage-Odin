@@ -3,8 +3,8 @@ import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
 import session from 'express-session';
-import passport from './middleware/passport.js';
-import pool from './prisma/Pool.js';
+import passport from './config/passport.js';
+import pool from './config/Pool.js';
 import { router as userRoutes } from './routes/userRouter.js';
 
 const ONE_DAY = 24 * 60 * 60 * 1000;

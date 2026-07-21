@@ -1,30 +1,58 @@
 import client from '../config/supabase.config.js';
-import { PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-async function uploadFile(req, res, next) {
+const uploadFile = async (file) => {
     const params = {
         Bucket: process.env.S3_BUCKET_NAME,
-        Key: req.file.originalname,
-        Body: req.file.buffer,
-        ContentType: req.file.mimetype,
-    };
-    const input = {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: req.file.originalname,
+        Key: `${crypto.randomUUID()}-${file.originalname}`,
+        Body: file.buffer,
+        ContentType: file.mimetype,
     };
     const command = new PutObjectCommand(params);
     try {
         const uploadData = await client.send(command);
-        if (uploadData.$metadata.httpStatusCode === 200) {
-            const getInfo = new GetObjectCommand(input);
-            const url = await getSignedUrl(client, getInfo, { expiresIn: 3600 });
-            return res.status(200).send(JSON.stringify(url));
+        if (uploadData.$metadata.httpStatusCode !== 200) {
+            throw new Error('File upload failed');
         }
-    } catch (error) {
-        console.log(error);
-        return res.status(404).send({ message: 'Error' });
-    }
-}
 
-export default uploadFile;
+        return {
+            key: params.Key,
+        };
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getSignedUrlByKey = async (key) => {
+    const input = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: key,
+    };
+    const getInfo = new GetObjectCommand(input);
+    try {
+        const url = await getSignedUrl(client, getInfo, { expiresIn: 3600 });
+        return url;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const deleteFile = async (key) => {
+    const input = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: key,
+    };
+    const command = new DeleteObjectCommand(input);
+    try {
+        const result = await client.send(command);
+        if (result.$metadata.httpStatusCode !== 200) {
+            throw new Error('File delete failed');
+        }
+        return { key };
+    } catch (error) {
+        throw error;
+    }
+};
+
+export { uploadFile, getSignedUrlByKey, deleteFile };
