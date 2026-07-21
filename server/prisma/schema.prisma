@@ -45,15 +45,16 @@ model Folder {
 }
 
 model File {
-  id          String   @id @default(uuid())
-  fileName    String
-  uploadedAt  DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  uploadedBy  User     @relation(fields: [userId], references: [id])
-  userId      String
-  folder      Folder   @relation(fields: [folderId], references: [id])
-  folderId    String
-  mimeType    String
-  storagePath String
-  publicUrl   String?
+  id           String   @id @default(uuid())
+  storageName  String   @unique
+  uploadedAt   DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  uploadedBy   User     @relation(fields: [userId], references: [id])
+  userId       String
+  folder       Folder   @relation(fields: [folderId], references: [id])
+  folderId     String
+  mimeType     String
+  publicUrl    String?
+  originalName String
+  fileSize     Int
 }
