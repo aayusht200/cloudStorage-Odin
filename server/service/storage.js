@@ -5,7 +5,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 const uploadFile = async (file) => {
     const params = {
         Bucket: process.env.S3_BUCKET_NAME,
-        Key: `${crypto.randomUUID()}-${file.originalname}`,
+        Key: `${crypto.randomUUID()}.${file.mimetype}`,
         Body: file.buffer,
         ContentType: file.mimetype,
     };

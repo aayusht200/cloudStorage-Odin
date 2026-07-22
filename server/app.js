@@ -6,7 +6,8 @@ import session from 'express-session';
 import passport from './config/passport.js';
 import pool from './config/Pool.js';
 import { router as userRoutes } from './routes/userRouter.js';
-
+import { router as fileRoutes } from './routes/fileRoute.js';
+import { router as folderRoutes } from './routes/folderRoute.js';
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const pgStore = new connectPgSimple(session);
 const app = express();
@@ -32,15 +33,17 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/api/users', userRoutes);
+app.use('/api/files', fileRoutes);
+app.use('/api/folders', folderRoutes);
 
-app.use((err, req, res, _next) => {
+app.use((err, _req, res, _next) => {
     console.error(err);
     res.status(err.status || 500).json({
         message: err.message || 'Internal Server Error',
     });
 });
 
-app.use((req, res) => {
+app.use((_, res) => {
     res.status(404).send({ message: 'Invalid route' });
 });
 
