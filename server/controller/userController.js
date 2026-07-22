@@ -1,6 +1,6 @@
-import prisma from '../config/Connection.js';
-import passport from 'passport';
 import bcrypt from 'bcrypt';
+import passport from 'passport';
+import prisma from '../config/Connection.js';
 const getUserById = async (req, res, next) => {
     try {
         const result = await prisma.user.findUnique({ where: { id: req.user.id } });
@@ -9,8 +9,13 @@ const getUserById = async (req, res, next) => {
                 message: 'User not found',
             });
         }
-        const { password: _, ...safeUser } = result;
-        return res.status(200).json(safeUser);
+        return res.status(200).json({
+            id: result.id,
+            email: result.email,
+            firstName: result.firstName,
+            lastName: result.lastName,
+            role: result.role,
+        });
     } catch (error) {
         next(error);
     }
@@ -69,4 +74,4 @@ const signupUser = async (req, res, next) => {
     }
 };
 
-export { getUserById, loginUser, signupUser, logoutUser };
+export { getUserById, loginUser, logoutUser, signupUser };

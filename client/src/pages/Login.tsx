@@ -11,13 +11,16 @@ import {
 } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-
+import type { LoginPayload } from "../service/login";
 export function Login() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm<LoginPayload>({
+    shouldUseNativeValidation: false,
+    progressive: false,
+  });
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
