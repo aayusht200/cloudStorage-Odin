@@ -1,7 +1,7 @@
 import { ModeToggle } from "../components/mode-toggle";
 import { ThemeProvider } from "../components/theme-provider";
-import { Login } from "../pages/Login";
 import "./App.css";
+import { Login } from "./pages/Login";
 function App() {
   return (
     <div className="bg-background flex h-dvh items-center justify-center">
