@@ -1,4 +1,5 @@
 import prisma from '../config/Connection.js';
+import { generatePath } from '../service/generatePath.js';
 const createFolder = async (req, res, next) => {
     const { folderName, parentId } = req.body;
     try {
@@ -41,6 +42,7 @@ const getFolderById = async (req, res, next) => {
         if (!result) {
             return res.status(404).json({ message: 'Folder with id not found' });
         }
+        const path = await generatePath(result.id);
         res.status(200).json({
             id: result.id,
             folderName: result.folderName,
@@ -48,6 +50,7 @@ const getFolderById = async (req, res, next) => {
             files: result.files,
             parentId: result.parentId,
             children: result.children,
+            path: path,
         });
     } catch (error) {
         next(error);
@@ -65,4 +68,4 @@ const deleteFolderId = async (req, res, next) => {
     }
 };
 
-export { getFolderById, deleteFolderId, createFolder };
+export { createFolder, deleteFolderId, getFolderById };

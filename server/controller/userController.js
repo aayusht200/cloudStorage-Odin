@@ -3,22 +3,37 @@ import passport from 'passport';
 import prisma from '../config/Connection.js';
 const getUserById = async (req, res, next) => {
     try {
-        await prisma.$transaction(async (tx) => {
-            const result = await tx.user.findUnique({ where: { id: req.user.id } });
-            if (!result) {
-                return res.status(404).json({
-                    message: 'User not found',
-                });
-            }
-            const rootFolder = await tx.folder.findFirst({ where: { userId: req.user.id, folderName: 'root' } });
-            return res.status(200).json({
-                id: result.id,
-                email: result.email,
-                firstName: result.firstName,
-                lastName: result.lastName,
-                role: result.role,
-                rootFolderId: rootFolder.id,
+        const [user, rootFolder] = await Promise.all([
+            prisma.user.findUnique({
+                where: { id: req.user.id },
+            }),
+            prisma.folder.findFirst({
+                where: {
+                    userId: req.user.id,
+                    folderName: 'root',
+                },
+            }),
+        ]);
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found',
             });
+        }
+
+        if (!rootFolder) {
+            return res.status(500).json({
+                message: 'Root folder missing',
+            });
+        }
+
+        return res.status(200).json({
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+            rootFolderId: rootFolder.id,
         });
     } catch (error) {
         next(error);
