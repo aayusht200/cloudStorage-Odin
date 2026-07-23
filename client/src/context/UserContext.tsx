@@ -38,6 +38,7 @@ export type UserContextProps = {
     firstName,
     lastName,
   }: SignupPayload) => Promise<void>;
+  isLoggedIn: boolean;
 };
 
 export const UserContext = createContext<UserContextProps>({
@@ -45,4 +46,5 @@ export const UserContext = createContext<UserContextProps>({
   loginUser: async () => {},
   logoutUser: async () => {},
   signupUser: async () => {},
+  isLoggedIn: false,
 });

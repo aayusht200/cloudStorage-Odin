@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "../components/ui/button";
 import {
@@ -11,8 +12,9 @@ import {
 } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import type { LoginPayload } from "../service/login";
+import { UserContext, type LoginPayload } from "../context/UserContext";
 export function Login() {
+  const { loginUser, isLoggedIn } = useContext(UserContext);
   const {
     register,
     handleSubmit,
@@ -21,6 +23,7 @@ export function Login() {
     shouldUseNativeValidation: false,
     progressive: false,
   });
+  console.log(isLoggedIn);
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
@@ -54,7 +57,13 @@ export function Login() {
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full cursor-pointer">
+        <Button
+          type="submit"
+          className="w-full cursor-pointer"
+          onClick={async () =>
+            await loginUser({ email: "test@test.com", password: "test@123" })
+          }
+        >
           Login
         </Button>
       </CardFooter>
