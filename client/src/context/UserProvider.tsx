@@ -3,30 +3,25 @@ import { useState } from "react";
 import { login } from "../service/login";
 import { logout } from "../service/logout";
 import { signup } from "../service/signup";
+
+import { useNavigate } from "react-router";
 import type { LoginPayload, SignupPayload, UserProps } from "./UserContext";
 import { InitialUser, UserContext } from "./UserContext";
 type UserProviderProps = {
   children: React.ReactNode;
-  initialUser: UserProps;
+  initialUser: UserProps | null;
 };
 
 export const UserProvider = ({ children, initialUser }: UserProviderProps) => {
-  const [user, setUser] = useState(initialUser);
+  const [user, setUser] = useState(initialUser ?? InitialUser);
+  const navigate = useNavigate();
   const loginUser = async ({ email, password }: LoginPayload) => {
-    try {
-      const data = await login({ email, password });
-      setUser(data.user);
-    } catch (error) {
-      throw error;
-    }
+    await login({ email, password });
   };
   const logoutUser = async () => {
-    try {
-      await logout();
-      setUser(InitialUser);
-    } catch (error) {
-      throw error;
-    }
+    await logout();
+    setUser(InitialUser);
+    navigate("/login", { replace: true });
   };
 
   const signupUser = async ({

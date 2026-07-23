@@ -1,4 +1,3 @@
-// loaders/authLoader.ts
 import { redirect } from "react-router";
 import { authenticate } from "../service/authenticate";
 

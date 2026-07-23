@@ -1,11 +1,9 @@
-import { redirect } from "react-router";
 import { authenticate } from "../service/authenticate";
-
 export async function rootLoader() {
   try {
-    await authenticate();
-    return redirect("/drive");
+    const user = await authenticate();
+    return user;
   } catch {
-    return redirect("/login");
+    return null;
   }
 }
