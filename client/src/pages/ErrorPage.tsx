@@ -1,10 +1,14 @@
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { useContext } from "react";
 import { useNavigate } from "react-router";
 import { ModeToggle } from "../components/mode-toggle";
 import { Button } from "../components/ui/button";
 import { ThemeProvider } from "../context/theme-provider";
+import { UserContext } from "../context/UserContext";
 
 export default function ErrorPage() {
+  const { user } = useContext(UserContext);
+  console.log(user);
   const navigate = useNavigate();
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">

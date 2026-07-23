@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import App from "./App";
-import { authLoader } from "./loaders/authLoader";
+import { driveLoader } from "./loaders/driveLoader";
 import { authRedirectLoader } from "./loaders/authRedirectLoader";
 import { rootLoader } from "./loaders/rootLoader";
 import DrivePage from "./pages/DrivePage";
@@ -33,8 +33,8 @@ export const router = createBrowserRouter([
         element: <SignupPage />,
       },
       {
-        path: "drive",
-        loader: authLoader,
+        path: "drive/:id",
+        loader: driveLoader,
         element: <DrivePage />,
       },
     ],

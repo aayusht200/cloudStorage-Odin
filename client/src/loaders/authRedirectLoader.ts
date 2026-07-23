@@ -4,7 +4,7 @@ import { authenticate } from "../service/authenticate";
 export async function authRedirectLoader() {
   try {
     await authenticate();
-    throw redirect("/drive");
+    throw redirect("/");
   } catch (error) {
     if (error instanceof Response) {
       throw error;

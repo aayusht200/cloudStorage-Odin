@@ -11,7 +11,7 @@ function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <UserProvider initialUser={user}>
-        <div className="bg-background flex h-dvh items-center justify-center">
+        <div className="bg-background h-dvh">
           <div className="absolute top-1 right-1 z-10">
             <ModeToggle />
           </div>

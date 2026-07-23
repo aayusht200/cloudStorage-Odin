@@ -16,12 +16,13 @@ export const UserProvider = ({ children, initialUser }: UserProviderProps) => {
   const [user, setUser] = useState(initialUser ?? InitialUser);
   const navigate = useNavigate();
   const loginUser = async ({ email, password }: LoginPayload) => {
-    await login({ email, password });
+    const verifiedUser = await login({ email, password });
+    setUser(verifiedUser.user);
   };
   const logoutUser = async () => {
     await logout();
     setUser(InitialUser);
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
   };
 
   const signupUser = async ({
