@@ -20,7 +20,7 @@ export default function ErrorPage() {
         />
         <Button
           variant="default"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/", { replace: true })}
           className="cursor-pointer"
         >
           Go Back
