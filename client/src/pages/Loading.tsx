@@ -10,7 +10,7 @@ function Loading() {
           <ModeToggle />
         </div>
         <DotLottieReact
-          src="/Loading.lottie"
+          src="/loading.lottie"
           loop
           autoplay
           className="aspect-square h-60 place-self-center md:h-100 lg:h-120 lg:w-240"

@@ -3,18 +3,22 @@ import passport from 'passport';
 import prisma from '../config/Connection.js';
 const getUserById = async (req, res, next) => {
     try {
-        const result = await prisma.user.findUnique({ where: { id: req.user.id } });
-        if (!result) {
-            return res.status(404).json({
-                message: 'User not found',
+        await prisma.$transaction(async (tx) => {
+            const result = await tx.user.findUnique({ where: { id: req.user.id } });
+            if (!result) {
+                return res.status(404).json({
+                    message: 'User not found',
+                });
+            }
+            const rootFolder = await tx.folder.findFirst({ where: { userId: req.user.id, folderName: 'root' } });
+            return res.status(200).json({
+                id: result.id,
+                email: result.email,
+                firstName: result.firstName,
+                lastName: result.lastName,
+                role: result.role,
+                rootFolderId: rootFolder.id,
             });
-        }
-        return res.status(200).json({
-            id: result.id,
-            email: result.email,
-            firstName: result.firstName,
-            lastName: result.lastName,
-            role: result.role,
         });
     } catch (error) {
         next(error);
@@ -62,10 +66,22 @@ const signupUser = async (req, res, next) => {
         const alreadyUser = await prisma.user.findUnique({ where: { email } });
         if (alreadyUser) return res.status(409).send({ message: 'User already exists' });
         const hashPassword = await bcrypt.hash(password, 10);
-        const result = await prisma.user.create({
-            data: { email, password: hashPassword, firstName, lastName },
+        await prisma.$transaction(async (tx) => {
+            const user = await tx.user.create({
+                data: {
+                    email,
+                    password: hashPassword,
+                    firstName,
+                    lastName,
+                },
+            });
+            await tx.folder.create({
+                data: {
+                    folderName: 'root',
+                    userId: user.id,
+                },
+            });
         });
-        const { password: _, ...safeUser } = result;
         return res.status(201).send({
             message: 'User created',
         });

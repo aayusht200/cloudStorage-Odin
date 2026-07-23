@@ -6,6 +6,7 @@ export type UserProps = {
   firstName: string;
   lastName: string;
   role: "USER" | "ADMIN";
+  rootFolderId: string;
 };
 
 export type LoginPayload = {
@@ -26,6 +27,7 @@ export const InitialUser: UserProps = {
   firstName: "",
   lastName: "",
   role: "USER",
+  rootFolderId: "",
 };
 
 export type UserContextProps = {
