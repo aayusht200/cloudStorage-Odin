@@ -1,10 +1,11 @@
 import express from 'express';
-import { getFileByID, deleteFileByID, createFile } from '../controller/fileController.js';
 import upload from '../config/multer.js';
+import { createFile, deleteFileByID, getFileByID } from '../controller/fileController.js';
+import { requireAuth } from '../middleware/authMiddleware.js';
 const router = new express.Router();
 
-router.post('/create', upload.single('file'), createFile);
-router.get('/:id', getFileByID);
-router.delete('/:id', deleteFileByID);
+router.post('/create', requireAuth, upload.single('file'), createFile);
+router.get('/:id', requireAuth, getFileByID);
+router.delete('/:id', requireAuth, deleteFileByID);
 
 export { router };

@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import App from "./App";
 import { authLoader } from "./loaders/authLoader";
-import { loginLoader } from "./loaders/loginLoader";
+import { authRedirectLoader } from "./loaders/authRedirectLoader";
 import { rootLoader } from "./loaders/rootLoader";
 import DrivePage from "./pages/DrivePage";
 import ErrorPage from "./pages/ErrorPage";
@@ -24,11 +24,12 @@ export const router = createBrowserRouter([
       },
       {
         path: "login",
-        loader: loginLoader,
+        loader: authRedirectLoader,
         element: <Login />,
       },
       {
         path: "signup",
+        loader: authRedirectLoader,
         element: <SignupPage />,
       },
       {

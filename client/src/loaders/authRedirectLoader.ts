@@ -1,7 +1,7 @@
 import { redirect } from "react-router";
 import { authenticate } from "../service/authenticate";
 
-export async function loginLoader() {
+export async function authRedirectLoader() {
   try {
     await authenticate();
     throw redirect("/drive");

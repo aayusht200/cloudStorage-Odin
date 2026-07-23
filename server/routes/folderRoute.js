@@ -1,9 +1,9 @@
 import express from 'express';
-import { getFolderById, deleteFolderId, createFolder } from '../controller/folderController.js';
-
+import { createFolder, deleteFolderId, getFolderById } from '../controller/folderController.js';
+import { requireAuth } from '../middleware/authMiddleware.js';
 const router = express.Router();
-router.post('/create', createFolder);
-router.get('/:id', getFolderById);
-router.delete('/:id', deleteFolderId);
+router.post('/create', requireAuth, createFolder);
+router.get('/:id', requireAuth, getFolderById);
+router.delete('/:id', requireAuth, deleteFolderId);
 
 export { router };
