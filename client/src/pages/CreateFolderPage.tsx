@@ -24,7 +24,7 @@ import {
 export function CreateFolder() {
   const [error, setError] = useState<boolean>(false);
   const drive = useLoaderData<typeof driveLoader>();
-  console.log(drive);
+
   const navigate = useNavigate();
   const {
     register,
