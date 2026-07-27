@@ -1,72 +1,109 @@
-# Server
+# Cloud Storage Odin Server
 
-The backend package uses Express, Prisma, and PostgreSQL. It runs as an ES module application with Nodemon for local development.
+The server is an Express API for authentication, folders, file metadata, session persistence, and S3-compatible file storage. It uses Prisma with PostgreSQL and stores sessions in PostgreSQL through `connect-pg-simple`.
 
-## Prerequisites
+## Tech Stack
 
-- Node.js and npm
-- A PostgreSQL database
+- Node.js and Express 5
+- Passport local authentication
+- Express Session with PostgreSQL session storage
+- Prisma and PostgreSQL
+- Multer for upload parsing
+- AWS SDK S3 client for S3-compatible object storage
 
 ## Setup
 
-1. Install dependencies from the repository root:
+Install dependencies from this directory:
 
-   ```bash
-   cd server
-   npm ci
-   ```
+```bash
+npm ci
+```
 
-2. Create `server/.env`:
+Create `server/.env`:
 
-   ```env
-   DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?schema=public"
-   PORT=3000
-   ORIGIN="http://localhost:5173"
-   ```
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?schema=public"
+SESSION_SECRET="replace-with-a-long-random-string"
+PORT=3000
+NODE_ENV=development
 
-   - `DATABASE_URL` is the PostgreSQL connection string used by Prisma.
-   - `PORT` is optional and defaults to `3000`.
-   - `ORIGIN` should match the client URL so credentialed cross-origin requests are allowed.
+S3_REGION="your-region"
+S3_ENDPOINT="https://your-s3-compatible-endpoint"
+S3_ACCESS_KEY_ID="your-access-key"
+S3_SECRET_ACCESS_KEY="your-secret-key"
+S3_BUCKET_NAME="your-bucket"
+```
 
-3. Generate the Prisma client:
+Generate the Prisma client after installing dependencies:
 
-   ```bash
-   npx prisma generate
-   ```
+```bash
+npx prisma generate
+```
+
+Apply existing migrations to a local database:
+
+```bash
+npx prisma migrate dev
+```
 
 Keep `.env` out of version control.
 
-## Database changes
+## Development
 
-After adding or changing models in `prisma/schema.prisma`, create and apply a development migration:
+```bash
+npm run dev
+```
+
+Nodemon starts `server.js` and restarts the API when source files change. With the default port, the API runs at `http://localhost:3000`.
+
+The app currently allows credentialed CORS requests from `http://localhost:5173` and matching `https://cloud-storage-odin*.vercel.app` deployments.
+
+## Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the API with Nodemon |
+| `npm start` | Start the API with Node |
+| `npm test` | Placeholder only; no test suite is configured yet |
+
+## API Routes
+
+All routes that read or modify drive data require an authenticated session.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/users/signup` | Create an account |
+| `POST` | `/api/users/login` | Login with Passport |
+| `POST` | `/api/users/logout` | Logout the current session |
+| `GET` | `/api/users/me` | Return the current user |
+| `POST` | `/api/folders/create` | Create a folder |
+| `GET` | `/api/folders/:id` | Get a folder and its contents |
+| `DELETE` | `/api/folders/:id` | Delete a folder |
+| `POST` | `/api/files/create` | Upload a file |
+| `GET` | `/api/files/:id` | Get file metadata and access URL |
+| `DELETE` | `/api/files/:id` | Delete a file |
+
+## Database
+
+The Prisma schema defines users, nested folders, and files:
+
+- `User`: account details, password hash, role, folders, and files
+- `Folder`: per-user folder names with optional parent folder hierarchy
+- `File`: storage object name, original name, MIME type, size, owner, and folder
+
+After changing `prisma/schema.prisma`, create and apply a migration:
 
 ```bash
 npx prisma migrate dev --name <migration-name>
 npx prisma generate
 ```
 
-## Start development
+## Production
 
-```bash
-npm run dev
-```
-
-Nodemon restarts the server when source files change. With the default configuration, the API is available at `http://localhost:3000`.
-
-To verify it is running:
-
-```bash
-curl http://localhost:3000/
-```
-
-The root endpoint responds with `hello world`.
-
-## Production start
-
-Provide the production environment variables through the hosting platform or process environment, then run:
+Set all required environment variables in the hosting platform, set `NODE_ENV=production`, and run:
 
 ```bash
 npm start
 ```
 
-The production process does not load `server/.env` automatically.
+Production cookies use `secure: true` and `sameSite: "none"`, so the API must be served over HTTPS when used by the deployed frontend.
