@@ -1,188 +1,222 @@
-# Cloud Storage --- Project Documentation
+# Cloud Storage Odin
 
-## Overview
+![React](https://img.shields.io/badge/React-19.2.7-61DAFB?style=flat-square&logo=react&logoColor=000)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-3178C6?style=flat-square&logo=typescript&logoColor=fff)
+![Vite](https://img.shields.io/badge/Vite-8.1.1-646CFF?style=flat-square&logo=vite&logoColor=fff)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.3.3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=fff)
+![Express](https://img.shields.io/badge/Express-5.2.1-000000?style=flat-square&logo=express&logoColor=fff)
+![Prisma](https://img.shields.io/badge/Prisma-7.8.0-2D3748?style=flat-square&logo=prisma&logoColor=fff)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pg%208.22.0-4169E1?style=flat-square&logo=postgresql&logoColor=fff)
+![Passport.js](https://img.shields.io/badge/Passport.js-0.7.0-34E27A?style=flat-square&logo=passport&logoColor=000)
+![AWS S3 Compatible Storage](https://img.shields.io/badge/S3%20Compatible%20Storage-AWS%20SDK%203.1095.0-FF9900?style=flat-square&logo=amazons3&logoColor=fff)
 
-Cloud Storage is a full-stack file management application that allows
-authenticated users to organize, upload, manage, and share files.
+Cloud Storage Odin is a full-stack cloud storage app for managing personal files and folders in a browser. It supports account-based access, nested folders, file uploads, inline previews for supported media, and signed links for stored files.
 
-The project is built using a React frontend and an Express backend with
-Prisma ORM and PostgreSQL. Authentication is session-based using
-Passport.js.
+## Live Demo
 
-The application begins by storing uploaded files locally during
-development and later transitions to cloud storage for production.
+https://cloud-storage-odin-six.vercel.app
+
+![Cloud Storage Odin drive dashboard](screenshot/home.png)
+
+## Repository
+
+https://github.com/aayusht200/cloudStorage-Odin
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Screenshots](#screenshots)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Deployment](#deployment)
+- [Challenges](#challenges)
+- [Future Improvements](#future-improvements)
+- [License](#license)
+
+---
+
+## Features
+
+- User registration, login, and logout
+- Session-based authentication with Passport.js
+- Protected frontend routes with React Router loaders
+- Folder creation, deletion, and navigation
+- Breadcrumb navigation
+- File upload to S3-compatible object storage
+- File preview for images, PDFs, audio, and video
+- File metadata display
+- Signed file URL copy/share action
+- File deletion
+- Download fallback for files without inline preview support
+- Light, dark, and system theme toggle
+- Responsive drive grid and form layouts
 
 ## Tech Stack
 
+| Area | Technologies |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, React Router, React Hook Form, Tailwind CSS, Base UI, Axios |
+| Backend | Node.js, Express, Passport.js, Express Session, Multer |
+| Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
+| Storage | AWS SDK for S3-compatible object storage |
+| Tooling | ESLint, Prettier, Nodemon |
+
+## Project Structure
+
+```text
+cloudStorage-Odin/
+├── client/   # Vite React app, routes, loaders, UI components, contexts, and API services
+└── server/   # Express API, controllers, routes, Prisma schema, auth, sessions, and storage logic
+```
+
+- `client/src/pages`: route-level screens for authentication, drive browsing, uploads, folder creation, loading, and errors.
+- `client/src/components`: reusable UI elements used across the drive and auth flows.
+- `client/src/service`: Axios API client and request helpers for auth, folders, files, upload, and deletion.
+- `client/src/loaders`: React Router loaders for authentication redirects and drive/file data fetching.
+- `server/routes`: Express routers for user, folder, and file endpoints.
+- `server/controller`: request handlers for authentication, folder operations, and file operations.
+- `server/config`: database, session, Passport, Multer, and S3-compatible storage configuration.
+- `server/service`: storage helpers for upload, deletion, signed URLs, and path generation.
+- `server/prisma`: Prisma schema and migrations for users, folders, and files.
+
+## Screenshots
+
+### Login
+
+![Login form with email and password fields](screenshot/login.png)
+
+### Signup
+
+![Signup form with name, email, and password fields](screenshot/signup.png)
+
+### Drive
+
+![Drive dashboard showing a folder and uploaded image files](screenshot/home.png)
+
+### Folder Creation
+
+![Create folder form for adding a folder in the root directory](screenshot/folderCreation.png)
+
+### File Upload
+
+![Upload form for choosing and submitting a file](screenshot/fileUpload.png)
+
+### Empty Drive
+
+![Empty drive state with an upload prompt](screenshot/emptyDrive.png)
+
+## Getting Started
+
+1. Clone the repository.
+
+```bash
+git clone git@github.com:aayusht200/cloudStorage-Odin.git
+cd cloudStorage-Odin
+```
+
+2. Install frontend dependencies.
+
+```bash
+cd client
+npm install
+```
+
+3. Install backend dependencies.
+
+```bash
+cd ../server
+npm install
+```
+
+4. Configure environment variables.
+
+Create `.env` files in `client/` and `server/` with the variables listed below.
+
+5. Run the frontend.
+
+```bash
+cd client
+npm run dev
+```
+
+6. Run the backend.
+
+```bash
+cd server
+npm run dev
+```
+
+### Available Scripts
+
+| Directory | Script | Purpose |
+| --- | --- | --- |
+| `client` | `npm run dev` | Start the Vite development server |
+| `client` | `npm run build` | Build the production frontend |
+| `client` | `npm run lint` | Run ESLint |
+| `client` | `npm run preview` | Preview the production frontend build |
+| `server` | `npm run dev` | Start the API with Nodemon |
+| `server` | `npm start` | Start the API with Node |
+
+> Note: the server includes an `npm test` placeholder that exits with an error; there is no configured test suite yet.
+
+## Environment Variables
+
 ### Frontend
 
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- React Router
+```text
+VITE_API_URL
+```
 
 ### Backend
 
-- Express
-- TypeScript
-- Prisma ORM
-- PostgreSQL
-- Passport.js
-- express-session
-- connect-pg-simple
-- Multer
-
-### Storage
-
-- Development: Supabase Storage
-- Production: Supabase Storage
-
-## Core Features
-
-- User registration and login
-- Session-based authentication
-- Folder CRUD
-- File upload
-- File download
-- File deletion
-- File metadata
-- Cloud storage integration
-- Folder sharing with expiring links
-
-## Development Roadmap
-
-### Phase 1
-
-- [x] Project setup
-- [x] Express
-- [x] Prisma
-- [x] Passport
-- [x] Session authentication
-
-### Phase 2
-
-- [x] User model
-- [x] Folder model
-- [x] File model
-
-### Phase 3
-
-- [ ] Folder CRUD
-
-### Phase 4
-
-- [ ] Local uploads with Multer
-
-### Phase 5
-
-- [ ] File management
-
-### Phase 6
-
-- [ ] Validation
-
-### Phase 7
-
-- [ ] Supabase integration
-
-### Phase 8
-
-- [ ] Folder sharing
-
-## Suggested Server Structure
-
 ```text
-server
-├── config
-│   ├── passport.ts
-│   ├── prisma.ts
-│   └── multer.ts
-├── controllers
-├── middleware
-├── prisma
-├── routes
-├── uploads
-└── generated
+PORT
+SESSION_SECRET
+NODE_ENV
+DATABASE_URL
+S3_REGION
+S3_ENDPOINT
+S3_ACCESS_KEY_ID
+S3_SECRET_ACCESS_KEY
+S3_BUCKET_NAME
 ```
 
-## Database Models
+## Deployment
 
-### User
+| Layer | Production Service |
+| --- | --- |
+| Frontend | Vercel |
+| Backend | Render |
+| Database | Supabase PostgreSQL |
+| File storage | S3-compatible object storage |
 
-- id
-- username
-- password
-- createdAt
+The client includes `client/vercel.json` to route Vercel requests to `index.html` for client-side routing.
 
-### Folder
+## Challenges
 
-- id
-- name
-- createdAt
-- updatedAt
-- ownerId
-
-### File
-
-- id
-- originalName
-- filename
-- mimeType
-- size
-- url
-- createdAt
-- folderId
-
-### Share (Optional)
-
-- id
-- token
-- expiresAt
-- folderId
-
-## Routes
-
-### Authentication
-
-```http
-POST /register
-POST /login
-POST /logout
-```
-
-### Folders
-
-```http
-GET    /folders
-GET    /folders/:id
-POST   /folders
-PATCH  /folders/:id
-DELETE /folders/:id
-```
-
-### Files
-
-```http
-POST   /folders/:id/files
-GET    /files/:id
-GET    /files/:id/download
-DELETE /files/:id
-```
-
-### Sharing
-
-```http
-POST /folders/:id/share
-GET  /share/:token
-```
+- Maintaining session-based authentication across a separate frontend and backend.
+- Persisting sessions in PostgreSQL while supporting production cookie settings.
+- Modeling folders and files so users can navigate a nested folder hierarchy.
+- Uploading files through the API and storing them in S3-compatible object storage.
+- Generating signed URLs for file preview and copy/share actions.
+- Using React Router loaders for route protection, redirects, and drive data fetching.
+- Configuring credentialed CORS between local development and deployed Vercel frontend URLs.
+- Supporting SPA routing on Vercel with an `index.html` rewrite.
 
 ## Future Improvements
 
+- Multiple file upload
 - Drag-and-drop uploads
-- Multiple file uploads
-- Search
-- Image previews
-- Storage dashboard
-- User quotas
-- Activity log
+- File and folder rename support
+- Search across files and folders
+- Dedicated download action for all file types
+- Automated test coverage
+- Improved empty states and loading states
+
+## License
+
+MIT
