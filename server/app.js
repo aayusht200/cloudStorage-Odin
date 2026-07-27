@@ -11,8 +11,19 @@ import { router as userRoutes } from './routes/userRouter.js';
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const pgStore = new connectPgSimple(session);
 const app = express();
-
-app.use(cors({ origin: process.env.ORIGIN, credentials: true })); //cors setup
+const allowedOrigins = ['http://localhost:5173', 'https://cloud-storage-odin.vercel.app'];
+app.use(
+    cors({
+        origin(origin, callback) {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        credentials: true,
+    })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('trust proxy', 1);
