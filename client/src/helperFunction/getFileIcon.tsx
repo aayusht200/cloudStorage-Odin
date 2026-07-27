@@ -2,21 +2,11 @@ import {
   File,
   FileArchive,
   FileAudio,
-  FileCode,
   FileImage,
   FileText,
   FileVideo,
 } from "lucide-react";
 
-const fileIcons = {
-  image: FileImage,
-  video: FileVideo,
-  audio: FileAudio,
-  text: FileText,
-  code: FileCode,
-  archive: FileArchive,
-  default: File,
-};
 export function getFileIcon(mimeType: string) {
   const Icon = mimeType.startsWith("image/")
     ? FileImage
