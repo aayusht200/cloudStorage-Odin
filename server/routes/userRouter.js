@@ -3,7 +3,7 @@ import { getUserById, loginUser, logoutUser, signupUser } from '../controller/us
 import { requireAuth } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
-router.get('/me', getUserById);
+router.get('/me', requireAuth, getUserById);
 router.post('/login', loginUser);
 router.post('/logout', requireAuth, logoutUser);
 

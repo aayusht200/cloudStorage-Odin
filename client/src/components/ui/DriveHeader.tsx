@@ -21,10 +21,9 @@ type DriveHeaderProps = {
 function DriveHeader({ path, folderId, fileName }: DriveHeaderProps) {
   const { logoutUser, user } = useContext(UserContext);
   const navigate = useNavigate();
-
   return (
     <header>
-      <nav className="flex h-fit w-dvw items-center justify-between px-3 pt-1">
+      <nav className="flex h-fit w-dvw items-center justify-between px-5 pt-3">
         <div className="left">
           <Breadcrumb>
             <BreadcrumbList>
@@ -57,8 +56,8 @@ function DriveHeader({ path, folderId, fileName }: DriveHeaderProps) {
           </Breadcrumb>
         </div>
         <div className="right flex gap-2">
-          {!window.location.pathname.includes("upload") ||
-            (window.location.pathname.includes("file") && (
+          {!window.location.pathname.includes("upload") &&
+            !window.location.pathname.includes("file") && (
               <Button
                 className="h-10 cursor-pointer"
                 variant="default"
@@ -68,7 +67,19 @@ function DriveHeader({ path, folderId, fileName }: DriveHeaderProps) {
               >
                 Upload
               </Button>
-            ))}
+            )}
+          {!window.location.pathname.includes("file") && (
+            <Button
+              className="h-10 cursor-pointer"
+              variant="default"
+              onClick={() => {
+                const folder = path.at(-1);
+                navigate(`/${folder?.id}/createfolder`);
+              }}
+            >
+              Create Folder
+            </Button>
+          )}
           <Button
             className="hover:bg-destructive mr-12 h-10 cursor-pointer"
             variant="default"

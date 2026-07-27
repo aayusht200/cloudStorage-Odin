@@ -10,6 +10,7 @@ import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
@@ -23,7 +24,7 @@ type UploadFormValues = {
 };
 function UploadPage() {
   const drive = useLoaderData<typeof driveLoader>();
-  const [error, setError] = useState<boolean>(false);
+  const [_, setError] = useState<boolean>(false);
   const navigate = useNavigate();
   const {
     register,
@@ -54,10 +55,11 @@ function UploadPage() {
       <main className="flex h-full items-center justify-center">
         <Card className="flex h-50 w-full max-w-sm flex-col md:h-60 lg:h-100">
           <CardHeader className="h-2/10">
-            <CardTitle>
+            <CardTitle>CloudDrive</CardTitle>
+            <CardDescription>
               Upload to
               {drive.folderName.toUpperCase()[0] + drive.folderName.slice(1)}
-            </CardTitle>
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid h-full">
             <form

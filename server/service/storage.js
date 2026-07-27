@@ -1,6 +1,6 @@
-import client from '../config/supabase.config.js';
-import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import client from '../config/supabase.config.js';
 
 const uploadFile = async (file) => {
     const params = {
@@ -46,7 +46,7 @@ const deleteFile = async (key) => {
     const command = new DeleteObjectCommand(input);
     try {
         const result = await client.send(command);
-        if (result.$metadata.httpStatusCode !== 200) {
+        if (result.$metadata.httpStatusCode !== 204) {
             throw new Error('File delete failed');
         }
         return { key };
@@ -55,4 +55,4 @@ const deleteFile = async (key) => {
     }
 };
 
-export { uploadFile, getSignedUrlByKey, deleteFile };
+export { deleteFile, getSignedUrlByKey, uploadFile };

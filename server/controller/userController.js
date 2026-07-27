@@ -2,6 +2,11 @@ import bcrypt from 'bcrypt';
 import passport from 'passport';
 import prisma from '../config/Connection.js';
 const getUserById = async (req, res, next) => {
+    if (!req.user) {
+        return res.status(404).json({
+            message: 'User not found',
+        });
+    }
     try {
         const [user, rootFolder] = await Promise.all([
             prisma.user.findUnique({

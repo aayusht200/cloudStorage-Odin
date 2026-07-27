@@ -1,3 +1,4 @@
+import axios from "axios";
 import { redirect } from "react-router";
 import { authenticate } from "../service/authenticate";
 
@@ -6,9 +7,9 @@ export async function authRedirectLoader() {
     await authenticate();
     throw redirect("/");
   } catch (error) {
-    if (error instanceof Response) {
-      throw error;
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      return null;
     }
-    return null;
+    throw error;
   }
 }

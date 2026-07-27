@@ -1,11 +1,13 @@
-import { Share2 } from "lucide-react";
-import { useLoaderData } from "react-router";
+import { Share2, Trash2 } from "lucide-react";
+import { useLoaderData, useNavigate } from "react-router";
 import { Button } from "../components/ui/button";
 import DriveHeader from "../components/ui/DriveHeader";
 import { FilePreview } from "../components/ui/FilePreview";
 import type { filesLoader } from "../loaders/filesLoader";
+import { deleteFile } from "../service/deleteFile";
 function FilesPage() {
   const file = useLoaderData<typeof filesLoader>();
+  const navigate = useNavigate();
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
       <DriveHeader path={file.path} fileName={file.name} />
@@ -23,19 +25,37 @@ function FilesPage() {
             Size: {(file.size / 1000000).toFixed(2)} MB
           </div>
 
-          <Button
-            variant="link"
-            className="hover:bg-secondary w-fit hover:cursor-pointer"
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(file.url);
-              } catch (error) {
-                alert("Copy failed tryagain!");
-              }
-            }}
-          >
-            <Share2 />
-          </Button>
+          <div className="action">
+            <Button
+              variant="link"
+              className="hover:bg-secondary w-fit hover:cursor-pointer"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(file.url);
+                } catch (error) {
+                  alert("Copy failed tryagain!");
+                }
+              }}
+            >
+              <Share2 />
+            </Button>
+            <Button
+              variant="link"
+              className="hover:bg-secondary w-fit hover:cursor-pointer"
+              onClick={async () => {
+                try {
+                  const parent = file.path.at(-1);
+
+                  await deleteFile(file.id);
+                  navigate(`/drive/${parent.id}`, { replace: true });
+                } catch (error) {
+                  alert(error);
+                }
+              }}
+            >
+              <Trash2 />
+            </Button>
+          </div>
         </div>
       </main>
     </div>

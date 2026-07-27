@@ -4,6 +4,7 @@ import { authRedirectLoader } from "./loaders/authRedirectLoader";
 import { driveLoader } from "./loaders/driveLoader";
 import { filesLoader } from "./loaders/filesLoader";
 import { rootLoader } from "./loaders/rootLoader";
+import { CreateFolder } from "./pages/CreateFolderPage";
 import DrivePage from "./pages/DrivePage";
 import ErrorPage from "./pages/ErrorPage";
 import FilesPage from "./pages/FilesPage";
@@ -49,6 +50,11 @@ export const router = createBrowserRouter([
         path: "file/:id",
         loader: filesLoader,
         element: <FilesPage />,
+      },
+      {
+        path: ":id/createfolder",
+        loader: driveLoader,
+        element: <CreateFolder />,
       },
     ],
   },
