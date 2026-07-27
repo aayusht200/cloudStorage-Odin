@@ -3,10 +3,10 @@ import { useLoaderData, useNavigate } from "react-router";
 import { Button } from "../components/ui/button";
 import DriveCard from "../components/ui/DriveCard";
 import DriveHeader from "../components/ui/DriveHeader";
+import { EmptyOutline } from "../components/ui/EmptyOutline";
 import { getFileIcon } from "../helperFunction/getFileIcon";
 import type { driveLoader } from "../loaders/driveLoader";
 import { deleteFolder } from "../service/deleteFolder";
-
 function DrivePage() {
   const drive = useLoaderData<typeof driveLoader>();
   const navigate = useNavigate();
@@ -26,10 +26,18 @@ function DrivePage() {
       console.log(error);
     }
   };
-
+  function handleUpload() {
+    navigate(`/upload/${drive.id}`);
+  }
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex h-dvh flex-col gap-10">
       <DriveHeader path={drive.path} folderId={drive.id} />
+
+      {drive.children.length === 0 && drive.files.length === 0 && (
+        <div>
+          <EmptyOutline onClick={handleUpload} />
+        </div>
+      )}
       <main className="grid grid-cols-2 gap-5 p-10 md:grid-cols-3 lg:grid-cols-4">
         {drive.children.map((folder: { id: string; folderName: string }) => {
           return (

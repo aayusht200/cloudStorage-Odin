@@ -61,7 +61,7 @@ function DriveHeader({ path, folderId, fileName }: DriveHeaderProps) {
               <Button
                 className="h-10 cursor-pointer"
                 variant="default"
-                onClick={async () => {
+                onClick={() => {
                   navigate(`/upload/${folderId}`);
                 }}
               >

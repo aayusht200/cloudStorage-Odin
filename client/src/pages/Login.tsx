@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
+import { HoverCardReadme } from "../components/ui/HoverCard";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { UserContext, type LoginPayload } from "../context/UserContext";
@@ -48,7 +49,10 @@ export function Login() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>CloudDrive</CardTitle>
-          <CardDescription>Login to your account</CardDescription>
+          <CardDescription>
+            Login to your account
+            <HoverCardReadme />
+          </CardDescription>
           <CardAction>
             <Button variant="link" onClick={() => navigate("/signup")}>
               Sign Up
