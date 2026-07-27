@@ -14,9 +14,11 @@ type DriveHeaderProps = {
     id: string;
     name: string;
   }[];
+  folderId?: string | null;
+  fileName?: string | null;
 };
 
-function DriveHeader({ path }: DriveHeaderProps) {
+function DriveHeader({ path, folderId, fileName }: DriveHeaderProps) {
   const { logoutUser, user } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -43,10 +45,30 @@ function DriveHeader({ path }: DriveHeaderProps) {
                   </Fragment>
                 ),
               )}
+              {fileName && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem className="font-heading overflow-hidden text-2xl leading-snug font-medium group-data-[size=sm]/card:text-sm">
+                    {fileName}
+                  </BreadcrumbItem>
+                </>
+              )}
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        <div className="right">
+        <div className="right flex gap-2">
+          {!window.location.pathname.includes("upload") ||
+            (window.location.pathname.includes("file") && (
+              <Button
+                className="h-10 cursor-pointer"
+                variant="default"
+                onClick={async () => {
+                  navigate(`/upload/${folderId}`);
+                }}
+              >
+                Upload
+              </Button>
+            ))}
           <Button
             className="hover:bg-destructive mr-12 h-10 cursor-pointer"
             variant="default"

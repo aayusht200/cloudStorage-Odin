@@ -1,5 +1,6 @@
-import { uploadFile, getSignedUrlByKey, deleteFile } from '../service/storage.js';
 import prisma from '../config/Connection.js';
+import { generatePath } from '../service/generatePath.js';
+import { deleteFile, getSignedUrlByKey, uploadFile } from '../service/storage.js';
 const createFile = async (req, res, next) => {
     const { folderId } = req.body;
     if (!req.file) {
@@ -50,6 +51,7 @@ const getFileByID = async (req, res, next) => {
             });
         }
         const url = await getSignedUrlByKey(fileInfo.storageName);
+        const path = await generatePath(fileInfo.folderId);
         if (url) {
             return res.status(200).json({
                 id: fileInfo.id,
@@ -58,6 +60,7 @@ const getFileByID = async (req, res, next) => {
                 type: fileInfo.mimeType,
                 updatedAt: fileInfo.updatedAt,
                 url: url,
+                path: path,
             });
         }
         return res.status(500).json({
@@ -81,4 +84,4 @@ const deleteFileByID = async (req, res, next) => {
     }
 };
 
-export { getFileByID, deleteFileByID, createFile };
+export { createFile, deleteFileByID, getFileByID };

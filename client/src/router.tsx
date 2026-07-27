@@ -11,6 +11,7 @@ import HomeRedirect from "./pages/HomeRedirect";
 import Loading from "./pages/Loading";
 import { Login } from "./pages/Login";
 import SignupPage from "./pages/SignupPage";
+import UploadPage from "./pages/UploadPage";
 export const router = createBrowserRouter([
   {
     id: "root",
@@ -40,7 +41,12 @@ export const router = createBrowserRouter([
         element: <DrivePage />,
       },
       {
-        path: "files/:id",
+        path: "upload/:id",
+        loader: driveLoader,
+        element: <UploadPage />,
+      },
+      {
+        path: "file/:id",
         loader: filesLoader,
         element: <FilesPage />,
       },

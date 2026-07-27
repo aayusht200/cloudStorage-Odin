@@ -45,7 +45,7 @@ export function Login() {
   const onError: SubmitErrorHandler<LoginPayload> = () => setError(false);
   return (
     <div className="flex h-full items-center justify-center">
-      <Card className="w-full max-w-sm">
+      <Card className="w-ufll max-w-sm">
         <CardHeader>
           <CardTitle>CloudDrive</CardTitle>
           <CardDescription>Login to your account</CardDescription>

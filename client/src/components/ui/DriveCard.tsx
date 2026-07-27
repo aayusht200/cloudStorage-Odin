@@ -14,14 +14,14 @@ function DriveCard({
       role="button"
       onClick={onClick}
       tabIndex={0}
-      className="border-foreground bg-accent grid cursor-pointer place-items-center rounded-xl border p-3 shadow"
+      className="bg-secondary text-primary grid h-40 md:h-50 lg:h-60 cursor-pointer place-items-center overflow-hidden rounded-xl border p-3 shadow"
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           onClick();
         }
       }}
     >
-      {icon}
+      <span className="flex h-4/5 items-center justify-center">{icon}</span>
       <span>{title}</span>
     </div>
   );
