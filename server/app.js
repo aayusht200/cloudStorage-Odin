@@ -5,9 +5,9 @@ import express from 'express';
 import session from 'express-session';
 import passport from './config/passport.js';
 import pool from './config/Pool.js';
-import { router as userRoutes } from './routes/userRouter.js';
 import { router as fileRoutes } from './routes/fileRoute.js';
 import { router as folderRoutes } from './routes/folderRoute.js';
+import { router as userRoutes } from './routes/userRouter.js';
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const pgStore = new connectPgSimple(session);
 const app = express();
@@ -15,6 +15,8 @@ const app = express();
 app.use(cors({ origin: process.env.ORIGIN, credentials: true })); //cors setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.set('trust proxy', 1);
+
 app.use(
     session({
         store: new pgStore({ pool, createTableIfMissing: true }),
