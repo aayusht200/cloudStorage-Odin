@@ -12,10 +12,12 @@ const ONE_DAY = 24 * 60 * 60 * 1000;
 const pgStore = new connectPgSimple(session);
 const app = express();
 const allowedOrigins = ['http://localhost:5173', 'https://cloud-storage-odin.vercel.app'];
+const allowedRegex = /^https:\/\/cloud-storage-odin.*\.vercel\.app$/;
+
 app.use(
     cors({
         origin(origin, callback) {
-            if (!origin || allowedOrigins.includes(origin)) {
+            if (!origin || origin === 'http://localhost:5173' || allowedRegex.test(origin)) {
                 callback(null, true);
             } else {
                 callback(new Error('Not allowed by CORS'));
