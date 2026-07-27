@@ -21,7 +21,7 @@ function DrivePage() {
         folderName: folderToDelete.folderName,
         parentId: drive.id,
       });
-      navigate(`/drive/${drive.parentId}`, { replace: true });
+      window.location.reload();
     } catch (error) {
       console.log(error);
     }
