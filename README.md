@@ -52,6 +52,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 - Signed file URL copy/share action
 - File deletion
 - Download fallback for files without inline preview support
+- Schema-driven form and request validation with Zod
 - Light, dark, and system theme toggle
 - Responsive drive grid and form layouts
 
@@ -59,8 +60,8 @@ https://github.com/aayusht200/cloudStorage-Odin
 
 | Area | Technologies |
 | --- | --- |
-| Frontend | React, TypeScript, Vite, React Router, React Hook Form, Tailwind CSS, Base UI, Axios |
-| Backend | Node.js, Express, Passport.js, Express Session, Multer |
+| Frontend | React, TypeScript, Vite, React Router, React Hook Form, Tailwind CSS, Base UI, Axios, Zod |
+| Backend | Node.js, Express, Passport.js, Express Session, Multer, Zod |
 | Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
 | Storage | AWS SDK for S3-compatible object storage |
 | Tooling | ESLint, Prettier, Nodemon |
@@ -77,8 +78,11 @@ cloudStorage-Odin/
 - `client/src/components`: reusable UI elements used across the drive and auth flows.
 - `client/src/service`: Axios API client and request helpers for auth, folders, files, upload, and deletion.
 - `client/src/loaders`: React Router loaders for authentication redirects and drive/file data fetching.
+- `client/src/schema`: Zod schemas and inferred payload types used for form validation and service contracts.
 - `server/routes`: Express routers for user, folder, and file endpoints.
 - `server/controller`: request handlers for authentication, folder operations, and file operations.
+- `server/schema`: Zod schemas used by reusable validation middleware for request bodies, route parameters, and uploaded files.
+- `server/middleware`: authentication middleware and reusable Zod request validation before controllers execute.
 - `server/config`: database, session, Passport, Multer, and S3-compatible storage configuration.
 - `server/service`: storage helpers for upload, deletion, signed URLs, and path generation.
 - `server/prisma`: Prisma schema and migrations for users, folders, and files.
@@ -195,6 +199,7 @@ S3_BUCKET_NAME
 | File storage | S3-compatible object storage |
 
 The client includes `client/vercel.json` to route Vercel requests to `index.html` for client-side routing.
+Incoming API payloads are validated with Zod middleware before reaching controllers.
 
 ## Challenges
 
