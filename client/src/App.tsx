@@ -2,10 +2,10 @@ import { Outlet, useLoaderData } from "react-router";
 import "./App.css";
 import { ModeToggle } from "./components/mode-toggle";
 import { ThemeProvider } from "./context/theme-provider";
-import type { UserProps } from "./context/User";
+import type { User } from "./context/User";
 import { UserProvider } from "./context/UserProvider";
 function App() {
-  const user = useLoaderData() as UserProps | null;
+  const user = useLoaderData() as User | null;
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">

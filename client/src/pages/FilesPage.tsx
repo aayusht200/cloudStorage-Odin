@@ -32,7 +32,7 @@ function FilesPage() {
               onClick={async () => {
                 try {
                   await navigator.clipboard.writeText(file.url);
-                } catch (error) {
+                } catch {
                   alert("Copy failed tryagain!");
                 }
               }}

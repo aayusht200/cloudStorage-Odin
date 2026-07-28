@@ -1,4 +1,4 @@
-import type { LoginPayload } from "../context/User";
+import type { LoginPayload } from "../schema/auth";
 import { api } from "./api";
 export const login = async ({ email, password }: LoginPayload) => {
   const result = await api.post("/users/login", {
