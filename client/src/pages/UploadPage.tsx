@@ -38,7 +38,6 @@ function UploadPage() {
       const file = data.file.item(0);
 
       const result = uploadFormSchema.safeParse({ file });
-
       if (!result.success) {
         setError(true);
         return;

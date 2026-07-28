@@ -12,7 +12,6 @@ const createFolder = async (req, res, next) => {
         });
         return res.status(201).json({ message: 'Folder created successfully', id: result.id });
     } catch (error) {
-        console.log(error.code);
         if (error.code === 'P2002') return res.status(409).json({ message: 'Folder with same name exists' });
         next(error);
     }

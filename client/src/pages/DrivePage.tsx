@@ -10,6 +10,7 @@ import { deleteFolder } from "../service/deleteFolder";
 function DrivePage() {
   const drive = useLoaderData<typeof driveLoader>();
   const navigate = useNavigate();
+  const [errors, setError] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState<{
     id: string;
     folderName: string;
@@ -22,8 +23,8 @@ function DrivePage() {
         parentId: drive.id,
       });
       window.location.reload();
-    } catch (error) {
-      console.log(error);
+    } catch {
+      setError(true);
     }
   };
   function handleUpload() {
@@ -47,6 +48,11 @@ function DrivePage() {
                 icon={getFileIcon("default")}
                 title={folder.folderName}
               />
+              {errors && (
+                <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
+                  Delete failed!
+                </span>
+              )}
               {folderToDelete?.id === folder.id ? (
                 <Button
                   className="hover:bg-destructive absolute top-2 right-2 hidden cursor-pointer group-hover:block"
