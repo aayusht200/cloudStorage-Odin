@@ -11,13 +11,18 @@ import { router as userRoutes } from './routes/userRouter.js';
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const pgStore = new connectPgSimple(session);
 const app = express();
-const allowedOrigins = ['http://localhost:5173', 'https://cloud-storage-odin.vercel.app'];
+const allowedOrigins = ['http://localhost:5173', 'https://cloud-storage-odin.vercel.app', 'http://localhost:4173'];
 const allowedRegex = /^https:\/\/cloud-storage-odin.*\.vercel\.app$/;
 
 app.use(
     cors({
         origin(origin, callback) {
-            if (!origin || origin === 'http://localhost:5173' || allowedRegex.test(origin)) {
+            if (
+                !origin ||
+                origin === 'http://localhost:4173' ||
+                origin === 'http://localhost:5173' ||
+                allowedRegex.test(origin)
+            ) {
                 callback(null, true);
             } else {
                 callback(new Error('Not allowed by CORS'));
