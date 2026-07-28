@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import {
   useForm,
@@ -17,10 +18,8 @@ import DriveHeader from "../components/ui/DriveHeader";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import type { driveLoader } from "../loaders/driveLoader";
-import {
-  createFolder,
-  type CreateFolderPayload,
-} from "../service/createFolder";
+import { createFolderSchema, type CreateFolderPayload } from "../schema/folder";
+import { createFolder } from "../service/createFolder";
 export function CreateFolder() {
   const [error, setError] = useState<boolean>(false);
   const drive = useLoaderData<typeof driveLoader>();
@@ -31,8 +30,7 @@ export function CreateFolder() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CreateFolderPayload>({
-    shouldUseNativeValidation: false,
-    progressive: false,
+    resolver: zodResolver(createFolderSchema),
   });
   const onSubmit: SubmitHandler<CreateFolderPayload> = async (data) => {
     setError(false);
@@ -68,9 +66,7 @@ export function CreateFolder() {
                     id="folderName"
                     type="text"
                     placeholder="Photos"
-                    {...register("folderName", {
-                      required: "Folder name required",
-                    })}
+                    {...register("folderName")}
                   />
                   {errors.folderName && (
                     <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
