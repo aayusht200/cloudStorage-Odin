@@ -5,15 +5,17 @@ import { logout } from "../service/logout";
 import { signup } from "../service/signup";
 
 import { useNavigate } from "react-router";
-import type { LoginPayload, SignupPayload, UserProps } from "./UserContext";
-import { InitialUser, UserContext } from "./UserContext";
+import type { LoginPayload, SignupPayload } from "../schema/auth";
+import type { User } from "./User";
+import { defaultUser, UserContext } from "./User";
+
 type UserProviderProps = {
   children: React.ReactNode;
-  initialUser: UserProps | null;
+  initialUser: User | null;
 };
 
 export const UserProvider = ({ children, initialUser }: UserProviderProps) => {
-  const [user, setUser] = useState(initialUser ?? InitialUser);
+  const [user, setUser] = useState(initialUser ?? defaultUser);
   const navigate = useNavigate();
   const loginUser = async ({ email, password }: LoginPayload) => {
     const verifiedUser = await login({ email, password });
@@ -21,7 +23,7 @@ export const UserProvider = ({ children, initialUser }: UserProviderProps) => {
   };
   const logoutUser = async () => {
     await logout();
-    setUser(InitialUser);
+    setUser(defaultUser);
     navigate("/", { replace: true });
   };
 

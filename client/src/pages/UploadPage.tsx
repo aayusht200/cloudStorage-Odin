@@ -18,6 +18,7 @@ import DriveHeader from "../components/ui/DriveHeader";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { driveLoader } from "../loaders/driveLoader";
+import { uploadFormSchema } from "../schema/file";
 import { upload } from "../service/upload";
 type UploadFormValues = {
   file: FileList;
@@ -30,16 +31,22 @@ function UploadPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<UploadFormValues>({
-    shouldUseNativeValidation: false,
-    progressive: false,
-  });
+  } = useForm<UploadFormValues>();
   const onSubmit: SubmitHandler<UploadFormValues> = async (data) => {
     setError(false);
     try {
+      const file = data.file.item(0);
+
+      const result = uploadFormSchema.safeParse({ file });
+
+      if (!result.success) {
+        setError(true);
+        return;
+      }
+
       await upload({
         folderId: drive.id,
-        file: data.file[0],
+        file: result.data.file,
       });
 
       navigate(`/drive/${drive.id}`);
@@ -70,11 +77,7 @@ function UploadPage() {
                 <Label htmlFor="file">
                   <File /> Chose File
                 </Label>
-                <Input
-                  id="file"
-                  type="file"
-                  {...register("file", { required: "Please select a file." })}
-                />
+                <Input id="file" type="file" {...register("file")} />
                 {errors.file?.message && <p>{errors.file.message}</p>}
                 <Button
                   disabled={isSubmitting}

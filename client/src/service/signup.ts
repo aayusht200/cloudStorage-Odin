@@ -1,4 +1,5 @@
-import type { SignupPayload } from "../context/UserContext";
+
+import type { SignupPayload } from "../schema/auth";
 import { api } from "./api";
 export const signup = async ({
   email,

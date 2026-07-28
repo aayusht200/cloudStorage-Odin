@@ -1,5 +1,5 @@
 import { Navigate, useRouteLoaderData } from "react-router";
-import type { UserProps } from "../context/UserContext";
+import type { UserProps } from "../context/User";
 
 export default function HomeRedirect() {
   const user = useRouteLoaderData<UserProps | null>("root");

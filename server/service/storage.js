@@ -5,7 +5,7 @@ import client from '../config/supabase.config.js';
 const uploadFile = async (file) => {
     const params = {
         Bucket: process.env.S3_BUCKET_NAME,
-        Key: `${crypto.randomUUID()}.${file.mimetype}`,
+        Key: `${crypto.randomUUID()}`,
         Body: file.buffer,
         ContentType: file.mimetype,
     };

@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext, useState } from "react";
 import {
   useForm,
@@ -16,7 +17,8 @@ import {
 } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { UserContext, type SignupPayload } from "../context/UserContext";
+import { UserContext } from "../context/User";
+import { signupSchema, type SignupPayload } from "../schema/auth";
 export default function SignupPage() {
   const { signupUser } = useContext(UserContext);
   const [error, setError] = useState<boolean>(false);
@@ -25,10 +27,7 @@ export default function SignupPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SignupPayload>({
-    shouldUseNativeValidation: false,
-    progressive: false,
-  });
+  } = useForm<SignupPayload>({ resolver: zodResolver(signupSchema) });
   const onSubmit: SubmitHandler<SignupPayload> = async (data) => {
     setError(false);
 
@@ -58,7 +57,7 @@ export default function SignupPage() {
           </CardAction>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit, onError)}>
+          <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="firstName">First Name</Label>
@@ -66,9 +65,7 @@ export default function SignupPage() {
                   id="firstName"
                   type="text"
                   placeholder="Adam"
-                  {...register("firstName", {
-                    required: "Required field",
-                  })}
+                  {...register("firstName")}
                 />
                 {errors.firstName && (
                   <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
@@ -82,9 +79,7 @@ export default function SignupPage() {
                   id="lastName"
                   type="text"
                   placeholder="Cole"
-                  {...register("lastName", {
-                    required: "Required field",
-                  })}
+                  {...register("lastName")}
                 />
                 {errors.lastName && (
                   <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
@@ -98,14 +93,7 @@ export default function SignupPage() {
                   id="email"
                   type="email"
                   placeholder="example@email.com"
-                  {...register("email", {
-                    required: "Required field",
-                    pattern: {
-                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                      message:
-                        "Email should match the pattern : example@email.com",
-                    },
-                  })}
+                  {...register("email")}
                 />
                 {errors.email && (
                   <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
@@ -120,17 +108,7 @@ export default function SignupPage() {
                 <Input
                   id="password"
                   type="password"
-                  {...register("password", {
-                    required: "Required field.",
-                    minLength: { value: 8, message: "Minimum length is 8" },
-                    maxLength: { value: 64, message: "Maximum length is 64" },
-                    pattern: {
-                      value:
-                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/,
-                      message:
-                        "Must contain uppercase, lowercase, number and special character",
-                    },
-                  })}
+                  {...register("password")}
                 />
                 {errors.password && (
                   <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
