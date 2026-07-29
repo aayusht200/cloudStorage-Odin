@@ -53,6 +53,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 - File deletion
 - Download fallback for files without inline preview support
 - Schema-driven form and request validation with Zod
+- Unit tested Zod validation schemas with Vitest covering authentication, folders, and file validation.
 - Light, dark, and system theme toggle
 - Responsive drive grid and form layouts
 
@@ -64,6 +65,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 | Backend | Node.js, Express, Passport.js, Express Session, Multer, Zod |
 | Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
 | Storage | AWS SDK for S3-compatible object storage |
+| Testing | Vitest |
 | Tooling | ESLint, Prettier, Nodemon |
 
 ## Project Structure
@@ -86,6 +88,7 @@ cloudStorage-Odin/
 - `server/config`: database, session, Passport, Multer, and S3-compatible storage configuration.
 - `server/service`: storage helpers for upload, deletion, signed URLs, and path generation.
 - `server/prisma`: Prisma schema and migrations for users, folders, and files.
+- `server/Tests`: Vitest unit tests for backend validation schemas.
 
 ## Screenshots
 
@@ -162,10 +165,12 @@ npm run dev
 | `client` | `npm run build` | Build the production frontend |
 | `client` | `npm run lint` | Run ESLint |
 | `client` | `npm run preview` | Preview the production frontend build |
+| `client` | `npm test` | Run Vitest |
 | `server` | `npm run dev` | Start the API with Nodemon |
 | `server` | `npm start` | Start the API with Node |
+| `server` | `npm test` | Run Vitest schema unit tests |
 
-> Note: the server includes an `npm test` placeholder that exits with an error; there is no configured test suite yet.
+The backend validation schema suite currently includes 47 passing unit tests covering valid and invalid inputs, boundary conditions, UUIDs, file uploads, MIME types, password complexity, and email validation.
 
 ## Environment Variables
 
@@ -219,7 +224,7 @@ Incoming API payloads are validated with Zod middleware before reaching controll
 - File and folder rename support
 - Search across files and folders
 - Dedicated download action for all file types
-- Automated test coverage
+- Expand unit testing beyond validation schemas to middleware, controllers, services, and React components.
 - Improved empty states and loading states
 
 ## License
