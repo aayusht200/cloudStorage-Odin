@@ -1,10 +1,66 @@
+import bcrypt from 'bcrypt';
+import { beforeEach, describe, it, vi } from 'vitest';
+import prisma from '../config/Connection';
+vi.mock('../config/Connection.js', () => ({
+    default: {
+        user: {
+            findUnique: vi.fn(),
+        },
+        folder: {
+            create: vi.fn(),
+        },
+        $transaction: vi.fn(),
+    },
+}));
+vi.mock('bcrypt', () => ({
+    default: {
+        hash: vi.fn(),
+    },
+}));
 describe('signupUser', () => {
+    let req;
+    let res;
+    let next;
+    beforeEach(() => {
+        req = {
+            body: {
+                email: 'test@test.com',
+                password: 'Test@123',
+                firstName: 'Aayush',
+                lastName: 'Trivedi',
+            },
+        };
+        res = {
+            status: vi.fn().mockReturnThis(),
+            json: vi.fn(),
+        };
+        next = vi.fn();
+    });
     describe('success', () => {
+        let tx;
+
         beforeEach(() => {
+            vi.clearAllMocks();
             // Arrange:
             // - prisma.user.findUnique -> null
+            prisma.user.findUnique.mockResolvedValue(null);
             // - bcrypt.hash -> hashed password
+            bcrypt.hash.mockResolvedValue('hashPassword');
             // - prisma.$transaction -> success
+            tx = {
+                user: {
+                    create: vi.fn().mockResolvedValue({
+                        id: 'user-id',
+                    }),
+                },
+                folder: {
+                    create: vi.fn().mockResolvedValue({}),
+                },
+            };
+
+            prisma.$transaction.mockImplementation(async (callback) => {
+                await callback(tx);
+            });
         });
 
         it('creates a user and root folder, then returns 201', async () => {
