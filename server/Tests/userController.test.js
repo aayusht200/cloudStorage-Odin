@@ -1,87 +1,70 @@
-import { beforeEach, describe, it, vi } from 'vitest';
-
-describe('userController', () => {
-    let req;
-    let res;
-    let next;
-
-    beforeEach(() => {
-        req = {
-            body: {
-                email: 'test@test.com',
-                password: 'Test@123',
-                firstName: 'Aayush',
-                lastName: 'Trivedi',
-            },
-        };
-
-        res = {
-            status: vi.fn().mockReturnThis(),
-            send: vi.fn(),
-        };
-
-        next = vi.fn();
-
-        vi.clearAllMocks();
-    });
-
-    describe('signupUser', () => {
-        describe('success', () => {
-            beforeEach(() => {
-                // Arrange successful mocks
-            });
-
-            it('creates a new user', async () => {});
-
-            it('hashes the password', async () => {});
-
-            it('creates the user inside a transaction', async () => {});
-
-            it('creates the root folder', async () => {});
-
-            it('returns status 201', async () => {});
-
-            it('returns a success message', async () => {});
+describe('signupUser', () => {
+    describe('success', () => {
+        beforeEach(() => {
+            // Arrange:
+            // - prisma.user.findUnique -> null
+            // - bcrypt.hash -> hashed password
+            // - prisma.$transaction -> success
         });
 
-        describe('failure', () => {
-            describe('user already exists', () => {
-                beforeEach(() => {
-                    // Mock existing user
-                });
+        it('creates a user and root folder, then returns 201', async () => {
+            // Arrange
+            // Act
+            // Assert
+            // - findUnique called with email
+            // - bcrypt.hash called with password
+            // - transaction called
+            // - tx.user.create called
+            // - tx.folder.create called
+            // - status 201
+            // - success message returned
+        });
+    });
 
-                it('returns status 409', async () => {});
-
-                it('returns an error message', async () => {});
-
-                it('does not hash the password', async () => {});
-
-                it('does not start a transaction', async () => {});
+    describe('failure', () => {
+        describe('when the user already exists', () => {
+            beforeEach(() => {
+                // Arrange:
+                // - prisma.user.findUnique -> existing user
             });
 
-            describe('database lookup fails', () => {
-                beforeEach(() => {
-                    // Mock prisma.findUnique throwing
-                });
+            it('returns 409 and does not continue with signup', async () => {
+                // Assert
+                // - status 409
+                // - error message
+                // - bcrypt.hash NOT called
+                // - transaction NOT called
+            });
+        });
 
-                it('passes the error to next()', async () => {});
+        describe('when checking for an existing user fails', () => {
+            beforeEach(() => {
+                // Arrange:
+                // - prisma.user.findUnique throws
             });
 
-            describe('password hashing fails', () => {
-                beforeEach(() => {
-                    // Mock bcrypt.hash throwing
-                });
+            it('passes the error to next()', async () => {});
+        });
 
-                it('passes the error to next()', async () => {});
+        describe('when password hashing fails', () => {
+            beforeEach(() => {
+                // Arrange:
+                // - findUnique -> null
+                // - bcrypt.hash throws
             });
 
-            describe('transaction fails', () => {
-                beforeEach(() => {
-                    // Mock prisma.$transaction throwing
-                });
+            it('passes the error to next()', async () => {});
+        });
 
-                it('passes the error to next()', async () => {});
+        describe('when the transaction fails', () => {
+            beforeEach(() => {
+                // Arrange:
+                // - findUnique -> null
+                // - bcrypt.hash succeeds
+                // - transaction throws
             });
+
+            it('passes the error to next()', async () => {});
         });
     });
 });
