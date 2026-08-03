@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { validate } from '../middleware/validate';
 import { signupSchema } from '../schema/auth';
-import { idSchema } from '../schema/file.js';
+import { createFileSchema, idSchema } from '../schema/file.js';
 
 describe('validate middleware', () => {
     let req;
@@ -33,6 +33,7 @@ describe('validate middleware', () => {
         };
 
         next = vi.fn();
+        vi.clearAllMocks();
     });
     describe('body validation', () => {
         beforeEach(() => {
@@ -120,30 +121,82 @@ describe('validate middleware', () => {
         });
         describe('valid params', () => {
             it('calls next()', () => {
-                
+                result(req, res, next);
+                expect(next).toHaveBeenCalled();
             });
-
-            it('replaces req.params with parsed data', () => {});
         });
 
         describe('invalid params', () => {
-            it('returns status 400', () => {});
+            it('returns status 400', () => {
+                result(
+                    {
+                        ...req,
+                        params: { id: `not a uuid` },
+                    },
+                    res,
+                    next
+                );
+                expect(res.status).toHaveBeenCalledWith(400);
+            });
 
-            it('does not call next()', () => {});
+            it('does not call next()', () => {
+                const copyReq = {
+                    ...req,
+                    params: { id: `not a uuid` },
+                };
+                result(copyReq, res, next);
+                expect(next).not.toHaveBeenCalled();
+            });
         });
     });
 
     describe('file validation', () => {
+        beforeEach(() => {
+            result = validate(createFileSchema, 'file');
+        });
         describe('valid file', () => {
-            it('calls next()', () => {});
+            it('calls next()', () => {
+                result(req, res, next);
+                expect(next).toHaveBeenCalled();
+            });
 
-            it('replaces req.file with parsed data', () => {});
+            it('replaces req.file with parsed data', () => {
+                const copyReq = {
+                    ...req,
+                    file: {
+                        ...req.file,
+                        originalname: 'testFileName  ',
+                    },
+                };
+                result(copyReq, res, next);
+                expect(copyReq.file.originalname).toBe('testFileName');
+            });
         });
 
         describe('invalid file', () => {
-            it('returns status 400', () => {});
+            it('returns status 400', () => {
+                const copyReq = {
+                    ...req,
+                    file: {
+                        ...req.file,
+                        mimetype: 'application/msword',
+                    },
+                };
+                result(copyReq, res, next);
+                expect(res.status).toHaveBeenCalledWith(400);
+            });
 
-            it('does not call next()', () => {});
+            it('does not call next()', () => {
+                const copyReq = {
+                    ...req,
+                    file: {
+                        ...req.file,
+                        mimetype: 'application/msword',
+                    },
+                };
+                result(copyReq, res, next);
+                expect(next).not.toHaveBeenCalled();
+            });
         });
     });
 });
