@@ -24,7 +24,7 @@ export const UserProvider = ({ children, initialUser }: UserProviderProps) => {
   const logoutUser = async () => {
     await logout();
     setUser(defaultUser);
-    navigate("/", { replace: true });
+    navigate("/login", { replace: true });
   };
 
   const signupUser = async ({
