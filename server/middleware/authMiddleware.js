@@ -1,9 +1,15 @@
 const requireAuth = (req, res, next) => {
+    console.log({
+        isAuthenticated: req.isAuthenticated(),
+        user: req.user,
+    });
+
     if (!req.isAuthenticated()) {
         return res.status(401).json({
             message: 'Unauthorized',
         });
     }
+
     next();
 };
 
@@ -17,4 +23,4 @@ const requireAdmin = (req, res, next) => {
     next();
 };
 
-export { requireAuth, requireAdmin };
+export { requireAdmin, requireAuth };
