@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { validate } from '../middleware/validate';
 import { signupSchema } from '../schema/auth';
 import { createFileSchema, idSchema } from '../schema/file.js';
