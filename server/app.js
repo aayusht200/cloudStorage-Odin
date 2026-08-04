@@ -54,6 +54,14 @@ app.use(
         },
     })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use('/api/users', userRoutes);
+app.use('/api/files', fileRoutes);
+app.use('/api/folders', folderRoutes);
+
 app.use((req, _res, next) => {
     console.log({
         method: req.method,
@@ -65,12 +73,6 @@ app.use((req, _res, next) => {
 
     next();
 });
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use('/api/users', userRoutes);
-app.use('/api/files', fileRoutes);
-app.use('/api/folders', folderRoutes);
 
 app.use((err, _req, res, _next) => {
     console.error(err);
