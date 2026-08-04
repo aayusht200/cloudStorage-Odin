@@ -16,7 +16,7 @@
     "main": "index.js",
     "scripts": {
         "test": "vitest",
-        "coverage": "npm test -- --coverage"
+        "coverage": "npm test -- --coverage && open coverage/index.html"
     },
     "private": true,
     "workspaces": [
@@ -29,5 +29,9 @@
     },
     "overrides": {
         "@tailwindcss/oxide-linux-x64-gnu": "4.3.3"
+    },
+    "devDependencies": {
+        "@vitest/ui": "^4.1.10",
+        "vitest": "^4.1.10"
     }
 }
