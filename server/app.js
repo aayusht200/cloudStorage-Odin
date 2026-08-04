@@ -49,6 +49,15 @@ app.use(
         },
     })
 );
+app.use((req, _res, next) => {
+    console.log({
+        origin: req.headers.origin,
+        cookie: req.headers.cookie,
+        sessionID: req.sessionID,
+    });
+
+    next();
+});
 app.use(passport.initialize());
 app.use(passport.session());
 
