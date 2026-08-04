@@ -14,21 +14,21 @@ const app = express();
 const allowedOrigins = ['http://localhost:5173', 'https://cloud-storage-odin.vercel.app', 'http://localhost:4173'];
 const allowedRegex = /^https:\/\/cloud-storage-odin.*\.vercel\.app$/;
 
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'https://cloud-storage-odin-client-rose.vercel.app',
+];
+
 app.use(
     cors({
         origin(origin, callback) {
-            if (
-                !origin ||
-                origin === 'http://localhost:4173' ||
-                origin === 'http://localhost:5173' ||
-                allowedRegex.test(origin)
-            ) {
-                callback(null, true);
-            } else {
-                callback(new Error('Not allowed by CORS'));
+            if (!origin || allowedOrigins.includes(origin) || allowedRegex.test(origin)) {
+                return callback(null, true);
             }
+
+            return callback(new Error('Not allowed by CORS'));
         },
-        credentials: true,
     })
 );
 app.use(express.json());
@@ -51,9 +51,11 @@ app.use(
 );
 app.use((req, _res, next) => {
     console.log({
-        origin: req.headers.origin,
+        method: req.method,
+        url: req.originalUrl,
         cookie: req.headers.cookie,
         sessionID: req.sessionID,
+        user: req.user?.id,
     });
 
     next();

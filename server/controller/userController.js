@@ -53,9 +53,14 @@ const loginUser = (req, res, next) => {
         }
         req.login(user, (err) => {
             if (err) return next(err);
-            return res.status(200).json({
-                message: 'Logged in',
-                user,
+
+            req.session.save((err) => {
+                if (err) return next(err);
+
+                return res.status(200).json({
+                    message: 'Logged in',
+                    user,
+                });
             });
         });
     })(req, res, next);
