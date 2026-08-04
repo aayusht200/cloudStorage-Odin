@@ -62,18 +62,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/folders', folderRoutes);
 
-app.use((req, _res, next) => {
-    console.log({
-        method: req.method,
-        url: req.originalUrl,
-        cookie: req.headers.cookie,
-        sessionID: req.sessionID,
-        user: req.user?.id,
-    });
-
-    next();
-});
-
 app.use((err, _req, res, _next) => {
     console.error(err);
     res.status(err.status || 500).json({
