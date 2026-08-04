@@ -14,7 +14,7 @@ Cloud Storage Odin is a full-stack cloud storage app for managing personal files
 
 ## Live Demo
 
-https://cloud-storage-odin-six.vercel.app
+https://cloud-storage-odin-client-rose.vercel.app
 
 ![Cloud Storage Odin drive dashboard](screenshot/home.png)
 
@@ -32,8 +32,11 @@ https://github.com/aayusht200/cloudStorage-Odin
 - [Screenshots](#screenshots)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
+- [Backend Overview](#backend-overview)
+- [Testing](#testing)
 - [Deployment](#deployment)
 - [Challenges](#challenges)
+- [Current Project Status](#current-project-status)
 - [Future Improvements](#future-improvements)
 - [License](#license)
 
@@ -53,7 +56,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 - File deletion
 - Download fallback for files without inline preview support
 - Schema-driven form and request validation with Zod
-- Unit tested Zod validation schemas with Vitest covering authentication, folders, and file validation.
+- Unit tested backend validation schemas, validation middleware, and user controllers with Vitest
 - Light, dark, and system theme toggle
 - Responsive drive grid and form layouts
 
@@ -66,7 +69,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 | Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
 | Storage | AWS SDK for S3-compatible object storage |
 | Testing | Vitest |
-| Tooling | ESLint, Prettier, Nodemon |
+| Tooling | ESLint, Prettier, Nodemon, Prisma CLI |
 
 ## Project Structure
 
@@ -88,7 +91,7 @@ cloudStorage-Odin/
 - `server/config`: database, session, Passport, Multer, and S3-compatible storage configuration.
 - `server/service`: storage helpers for upload, deletion, signed URLs, and path generation.
 - `server/prisma`: Prisma schema and migrations for users, folders, and files.
-- `server/Tests`: Vitest unit tests for backend validation schemas.
+- `server/Tests`: Vitest unit tests for backend validation schemas, validation middleware, and user controllers.
 
 ## Screenshots
 
@@ -168,9 +171,10 @@ npm run dev
 | `client` | `npm test` | Run Vitest |
 | `server` | `npm run dev` | Start the API with Nodemon |
 | `server` | `npm start` | Start the API with Node |
-| `server` | `npm test` | Run Vitest schema unit tests |
+| `server` | `npm test` | Run Vitest unit tests |
+| `server` | `npm test -- --coverage --run` | Run backend tests with coverage |
 
-The backend validation schema suite currently includes 47 passing unit tests covering valid and invalid inputs, boundary conditions, UUIDs, file uploads, MIME types, password complexity, and email validation.
+The backend test suite currently includes 79 passing unit tests. Coverage from the latest backend report is 100% statements, 100% branches, 100% functions, and 100% lines.
 
 ## Environment Variables
 
@@ -193,6 +197,47 @@ S3_ACCESS_KEY_ID
 S3_SECRET_ACCESS_KEY
 S3_BUCKET_NAME
 ```
+
+## Backend Overview
+
+### Authentication Flow
+
+The API uses `express-session` with a PostgreSQL-backed session store and Passport local authentication. Signup validates the request body, checks for an existing user, hashes the password with bcrypt, and creates the user plus a root folder in a Prisma transaction. Login validates credentials through Passport and stores the authenticated user id in the session. Protected routes use `requireAuth`, and logout destroys the session before clearing the `connect.sid` cookie.
+
+### API Overview
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/users/signup` | Create an account |
+| `POST` | `/api/users/login` | Login with Passport |
+| `POST` | `/api/users/logout` | Logout the current session |
+| `GET` | `/api/users/me` | Return the current user and root folder id |
+| `POST` | `/api/folders/create` | Create a folder |
+| `GET` | `/api/folders/:id` | Get a folder, its children, files, and path |
+| `DELETE` | `/api/folders/:id` | Delete a folder |
+| `POST` | `/api/files/create` | Upload a file |
+| `GET` | `/api/files/:id` | Get file metadata, path, and a signed URL |
+| `DELETE` | `/api/files/:id` | Delete a file |
+
+### Database Overview
+
+Prisma models users, folders, and files in PostgreSQL. Users have a unique email, role, hashed password, folders, and files. Folders belong to users, support parent-child nesting, and enforce unique folder names per user and parent folder. Files belong to both a user and folder, store original metadata, and use a unique storage object name.
+
+### Storage Overview
+
+Uploads are parsed in memory with Multer, limited to 10 MB, and stored through the AWS SDK S3 client against an S3-compatible endpoint. Stored objects use generated UUID keys. File reads return signed URLs that expire after one hour, and deletes remove the object before deleting database metadata.
+
+### Validation Strategy
+
+Zod schemas validate auth payloads, folder creation payloads, route ids, and uploaded file objects. The reusable `validate` middleware parses `body`, `params`, or `file`, replaces the request target with parsed data, and returns `400` with flattened Zod errors when validation fails.
+
+### Error Handling
+
+Controllers return explicit client errors for expected cases such as duplicate users, duplicate folders, missing folders, missing files, invalid folder ids, unauthenticated requests, and validation failures. Unexpected errors are passed to the centralized Express error handler, which returns the error status when present or `500`.
+
+## Testing
+
+Backend tests use Vitest in a Node environment. Tests are organized under `server/Tests` and currently cover authentication schemas, folder schemas, file schemas, the reusable validation middleware, and user controller behavior. Controller tests mock Prisma, bcrypt, Passport, request/session methods, and response helpers. Middleware tests exercise body, params, and file validation. Schema tests cover valid and invalid input, boundary conditions, UUID validation, file upload schema validation, MIME types, password complexity, and email validation.
 
 ## Deployment
 
@@ -217,6 +262,10 @@ Incoming API payloads are validated with Zod middleware before reaching controll
 - Configuring credentialed CORS between local development and deployed Vercel frontend URLs.
 - Supporting SPA routing on Vercel with an `index.html` rewrite.
 
+## Current Project Status
+
+The project has a working full-stack implementation with session authentication, nested folders, file upload and deletion, signed file URLs, Zod validation, Prisma migrations, and backend unit tests with coverage reporting.
+
 ## Future Improvements
 
 - Multiple file upload
@@ -224,7 +273,7 @@ Incoming API payloads are validated with Zod middleware before reaching controll
 - File and folder rename support
 - Search across files and folders
 - Dedicated download action for all file types
-- Expand unit testing beyond validation schemas to middleware, controllers, services, and React components.
+- Expand backend unit testing beyond validation middleware and user controllers to folder controllers, file controllers, services, and route behavior.
 - Improved empty states and loading states
 
 ## License
