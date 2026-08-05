@@ -1,9 +1,12 @@
+import { inject } from "@vercel/analytics";
 import { Outlet, useLoaderData } from "react-router";
 import "./App.css";
 import { ModeToggle } from "./components/mode-toggle";
 import { ThemeProvider } from "./context/theme-provider";
 import type { User } from "./context/User";
 import { UserProvider } from "./context/UserProvider";
+
+inject();
 function App() {
   const user = useLoaderData() as User | null;
 
