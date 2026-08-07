@@ -478,6 +478,30 @@ describe('loginUser', () => {
             expect(res.json).not.toHaveBeenCalled();
             expect(res.status).not.toHaveBeenCalled();
         });
+        it('when req.session.save fails', () => {
+            //Arrange
+            const error = new Error('Login failed');
+            passport.authenticate.mockImplementation((_, callback) => {
+                return (req, res, next) => callback(null, { id: 'user-id', email: 'test@test.com' }, null);
+            });
+            req.login.mockImplementation((user, callback) => {
+                callback(null);
+            });
+            req.session.save.mockImplementation(( callback) => {
+                callback(error);
+            });
+            //Assert
+            loginUser(req, res, next);
+            //passport.authenticate succeeds
+            expect(passport.authenticate).toHaveBeenCalledWith('local', expect.any(Function));
+            //req.login called
+            expect(req.login).toHaveBeenCalledWith({ id: 'user-id', email: 'test@test.com' }, expect.any(Function));
+            //next(error) called
+            expect(next).toHaveBeenCalledWith(error);
+            //no success response sent
+            expect(res.json).not.toHaveBeenCalled();
+            expect(res.status).not.toHaveBeenCalled();
+        });
     });
 });
 
