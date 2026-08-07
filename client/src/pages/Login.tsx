@@ -5,7 +5,7 @@ import {
   type SubmitErrorHandler,
   type SubmitHandler,
 } from "react-hook-form";
-import { useNavigate, useRevalidator } from "react-router";
+import { useNavigate } from "react-router";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -24,7 +24,6 @@ export function Login() {
   const { loginUser } = useContext(UserContext);
   const [error, setError] = useState<boolean>(false);
   const navigate = useNavigate();
-  const { revalidate } = useRevalidator();
 
   const {
     register,
@@ -38,7 +37,6 @@ export function Login() {
 
     try {
       await loginUser(data);
-      await revalidate();
       navigate("/", { replace: true });
     } catch {
       setError(true);

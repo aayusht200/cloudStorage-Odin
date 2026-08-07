@@ -375,6 +375,9 @@ describe('loginUser', () => {
                 password: 'Test@123',
             },
             login: vi.fn(),
+            session: {
+                save: vi.fn(),
+            },
         };
 
         res = {
@@ -400,6 +403,9 @@ describe('loginUser', () => {
             req.login.mockImplementation((user, callback) => {
                 callback(null);
             });
+            req.session.save.mockImplementation((callback) => {
+                callback(null);
+            });
         });
         it('Login succeeds', async () => {
             //Assert
@@ -408,6 +414,8 @@ describe('loginUser', () => {
             expect(passport.authenticate).toHaveBeenCalled();
             //req.login called with authenticated user
             expect(req.login).toHaveBeenCalled();
+            //req.session.save called
+            expect(req.session.save).toHaveBeenCalledWith(expect.any(Function));
             //status 200 returned
             expect(res.status).toHaveBeenCalledWith(200);
             //success response returned
