@@ -7,7 +7,8 @@
         "test": "vitest",
         "dev": "nodemon server.js",
         "start": "node server.js",
-        "generate": "prisma generate"
+        "generate": "prisma generate",
+        "coverage": "vitest --coverage"
     },
     "keywords": [],
     "author": "",
