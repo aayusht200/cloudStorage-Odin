@@ -56,7 +56,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 - File deletion
 - Download fallback for files without inline preview support
 - Schema-driven form and request validation with Zod
-- Unit tested backend validation schemas, validation middleware, and user controllers with Vitest
+- Unit and integration tested backend controllers, routes, validation middleware, and Zod schemas with Vitest and Supertest
 - Light, dark, and system theme toggle
 - Responsive drive grid and form layouts
 
@@ -65,10 +65,10 @@ https://github.com/aayusht200/cloudStorage-Odin
 | Area | Technologies |
 | --- | --- |
 | Frontend | React, TypeScript, Vite, React Router, React Hook Form, Tailwind CSS, Base UI, Axios, Zod |
-| Backend | Node.js, Express, Passport.js, Express Session, Multer, Zod |
+| Backend | Node.js, Express, Passport.js, Express Session, connect-pg-simple, Multer, Zod, bcrypt |
 | Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
 | Storage | AWS SDK for S3-compatible object storage |
-| Testing | Vitest |
+| Testing | Vitest, Supertest |
 | Tooling | ESLint, Prettier, Nodemon, Prisma CLI |
 
 ## Project Structure
@@ -91,7 +91,7 @@ cloudStorage-Odin/
 - `server/config`: database, session, Passport, Multer, and S3-compatible storage configuration.
 - `server/service`: storage helpers for upload, deletion, signed URLs, and path generation.
 - `server/prisma`: Prisma schema and migrations for users, folders, and files.
-- `server/Tests`: Vitest unit tests for backend validation schemas, validation middleware, and user controllers.
+- `server/Tests`: Vitest unit and Supertest integration tests for backend schemas, middleware, controllers, and routes.
 
 ## Screenshots
 
@@ -171,10 +171,13 @@ npm run dev
 | `client` | `npm test` | Run Vitest |
 | `server` | `npm run dev` | Start the API with Nodemon |
 | `server` | `npm start` | Start the API with Node |
-| `server` | `npm test` | Run Vitest unit tests |
-| `server` | `npm test -- --coverage --run` | Run backend tests with coverage |
+| `server` | `npm test` | Run backend Vitest tests |
+| `server` | `npm run coverage` | Run backend tests with V8 coverage |
+| root | `npm test` | Run workspace Vitest tests |
+| root | `npm run coverage` | Run backend coverage from the workspace root |
+| root | `npm run test-ui` | Open the Vitest UI for the backend workspace |
 
-The backend test suite currently includes 79 passing unit tests. Coverage from the latest backend report is 100% statements, 100% branches, 100% functions, and 100% lines.
+The latest backend coverage run reports 140 passing tests across 10 test files.
 
 ## Environment Variables
 
@@ -202,7 +205,7 @@ S3_BUCKET_NAME
 
 ### Authentication Flow
 
-The API uses `express-session` with a PostgreSQL-backed session store and Passport local authentication. Signup validates the request body, checks for an existing user, hashes the password with bcrypt, and creates the user plus a root folder in a Prisma transaction. Login validates credentials through Passport and stores the authenticated user id in the session. Protected routes use `requireAuth`, and logout destroys the session before clearing the `connect.sid` cookie.
+The API uses `express-session` with a PostgreSQL-backed session store and Passport local authentication. Signup validates the request body, checks for an existing user, hashes the password with bcrypt, and creates the user plus a root folder in a Prisma transaction. Login validates credentials through Passport, stores the authenticated user id in the session, and saves the session before responding. Protected routes use `requireAuth`, and logout destroys the session before clearing the `connect.sid` cookie.
 
 ### API Overview
 
@@ -229,7 +232,7 @@ Uploads are parsed in memory with Multer, limited to 10 MB, and stored through t
 
 ### Validation Strategy
 
-Zod schemas validate auth payloads, folder creation payloads, route ids, and uploaded file objects. The reusable `validate` middleware parses `body`, `params`, or `file`, replaces the request target with parsed data, and returns `400` with flattened Zod errors when validation fails.
+Zod schemas validate auth payloads, folder creation payloads, route ids, and uploaded file objects. The reusable `validate` middleware parses `body`, `params`, or `file`, replaces the request target with parsed data, and returns `400` with flattened Zod errors when validation fails. File uploads are also filtered by Multer before controller logic runs.
 
 ### Error Handling
 
@@ -237,7 +240,25 @@ Controllers return explicit client errors for expected cases such as duplicate u
 
 ## Testing
 
-Backend tests use Vitest in a Node environment. Tests are organized under `server/Tests` and currently cover authentication schemas, folder schemas, file schemas, the reusable validation middleware, and user controller behavior. Controller tests mock Prisma, bcrypt, Passport, request/session methods, and response helpers. Middleware tests exercise body, params, and file validation. Schema tests cover valid and invalid input, boundary conditions, UUID validation, file upload schema validation, MIME types, password complexity, and email validation.
+Backend tests use Vitest in a Node environment. Tests are organized under `server/Tests`, with unit tests under `server/Tests/Unit Test` and HTTP integration tests under `server/Tests/Integration`.
+
+| Test type | Current coverage |
+| --- | --- |
+| Unit tests | Controllers, validation middleware, and Zod schemas |
+| Integration tests | User routes, login/session behavior, logout/session destruction, folder routes, file routes, authentication failures, validation failures, file upload/delete behavior, and database-backed request flows |
+
+Controller unit tests mock Prisma, bcrypt, Passport, request/session methods, response helpers, and storage helpers where appropriate. Middleware tests exercise body, params, and file validation. Schema tests cover valid and invalid input, boundary conditions, UUID validation, file upload schema validation, MIME types, password complexity, and email validation.
+
+Supertest is used for HTTP integration testing. Tests use `request.agent(app)` where session and cookie persistence is required across login, authenticated requests, and logout.
+
+Latest backend coverage:
+
+| Metric | Coverage |
+| --- | --- |
+| Statements | 95.11% |
+| Branches | 84.93% |
+| Functions | 96.66% |
+| Lines | 94.85% |
 
 ## Deployment
 
@@ -264,7 +285,7 @@ Incoming API payloads are validated with Zod middleware before reaching controll
 
 ## Current Project Status
 
-The project has a working full-stack implementation with session authentication, nested folders, file upload and deletion, signed file URLs, Zod validation, Prisma migrations, and backend unit tests with coverage reporting.
+The project has a working full-stack implementation with session authentication, nested folders, file upload and deletion, signed file URLs, Zod validation, Prisma migrations, and backend unit/integration tests with coverage reporting.
 
 ## Future Improvements
 
@@ -273,7 +294,7 @@ The project has a working full-stack implementation with session authentication,
 - File and folder rename support
 - Search across files and folders
 - Dedicated download action for all file types
-- Expand backend unit testing beyond validation middleware and user controllers to folder controllers, file controllers, services, and route behavior.
+- Expand test coverage for storage/service edge cases and frontend React components.
 - Improved empty states and loading states
 
 ## License

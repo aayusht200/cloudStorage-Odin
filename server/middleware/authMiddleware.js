@@ -8,14 +8,14 @@ const requireAuth = (req, res, next) => {
     next();
 };
 
-const requireAdmin = (req, res, next) => {
-    if (req.user.role !== 'ADMIN') {
-        return res.status(403).json({
-            message: 'Forbidden',
-        });
-    }
+// const requireAdmin = (req, res, next) => {
+//     if (req.user.role !== 'ADMIN') {
+//         return res.status(403).json({
+//             message: 'Forbidden',
+//         });
+//     }
 
-    next();
-};
+//     next();
+// };
 
-export { requireAdmin, requireAuth };
+export { requireAuth };
