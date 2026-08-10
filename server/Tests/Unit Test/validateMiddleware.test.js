@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { validate } from '../middleware/validate';
-import { signupSchema } from '../schema/auth';
-import { createFileSchema, idSchema } from '../schema/file.js';
+import { validate } from '../../middleware/validate';
+import { signupSchema } from '../../schema/auth';
+import { createFileSchema, idSchema } from '../../schema/file.js';
 
 describe('validate middleware', () => {
     let req;

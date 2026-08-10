@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 import passport from 'passport';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import prisma from '../config/Connection';
-import { getUserById, loginUser, logoutUser, signupUser } from '../controller/userController';
-vi.mock('../config/Connection.js', () => ({
+import prisma from '../../config/Connection';
+import { getUserById, loginUser, logoutUser, signupUser } from '../../controller/userController';
+vi.mock('../../config/Connection.js', () => ({
     default: {
         user: {
             findUnique: vi.fn(),
@@ -487,7 +487,7 @@ describe('loginUser', () => {
             req.login.mockImplementation((user, callback) => {
                 callback(null);
             });
-            req.session.save.mockImplementation(( callback) => {
+            req.session.save.mockImplementation((callback) => {
                 callback(error);
             });
             //Assert

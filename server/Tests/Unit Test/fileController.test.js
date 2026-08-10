@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import prisma from '../config/Connection.js';
-import { createFile, deleteFileByID, getFileByID } from '../controller/fileController';
-import { generatePath } from '../service/generatePath.js';
-import { deleteFile, getSignedUrlByKey, uploadFile } from '../service/storage.js';
-vi.mock('../config/Connection.js', () => ({
+import prisma from '../../config/Connection.js';
+import { createFile, deleteFileByID, getFileByID } from '../../controller/fileController';
+import { generatePath } from '../../service/generatePath.js';
+import { deleteFile, getSignedUrlByKey, uploadFile } from '../../service/storage.js';
+vi.mock('../../config/Connection.js', () => ({
     default: {
         folder: {
             findFirst: vi.fn(),
@@ -16,12 +16,12 @@ vi.mock('../config/Connection.js', () => ({
     },
 }));
 
-vi.mock('../service/storage.js', () => ({
+vi.mock('../../service/storage.js', () => ({
     uploadFile: vi.fn(),
     getSignedUrlByKey: vi.fn(),
     deleteFile: vi.fn(),
 }));
-vi.mock('../service/generatePath.js', () => ({
+vi.mock('../../service/generatePath.js', () => ({
     generatePath: vi.fn(),
 }));
 

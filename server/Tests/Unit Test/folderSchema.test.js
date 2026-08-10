@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createFolderSchema } from '../schema/folder';
+import { createFolderSchema } from '../../schema/folder';
 describe('folderSchema', () => {
     const folderData = {
         folderName: 'testFolder',

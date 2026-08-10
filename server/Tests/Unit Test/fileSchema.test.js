@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer';
 import { describe, expect, it } from 'vitest';
-import { createFileSchema, idSchema } from '../schema/file';
+import { createFileSchema, idSchema } from '../../schema/file';
 describe('fileSchema', () => {
     const validFile = {
         originalname: 'demoFile',

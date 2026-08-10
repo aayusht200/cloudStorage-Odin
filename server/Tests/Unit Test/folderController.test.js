@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import prisma from '../config/Connection.js';
-import { createFolder, deleteFolderId, getFolderById } from '../controller/folderController';
-import { generatePath } from '../service/generatePath';
+import prisma from '../../config/Connection.js';
+import { createFolder, deleteFolderId, getFolderById } from '../../controller/folderController';
+import { generatePath } from '../../service/generatePath';
 
-vi.mock('../config/Connection.js', () => ({
+vi.mock('../../config/Connection.js', () => ({
     default: {
         folder: {
             create: vi.fn(),
@@ -13,7 +13,7 @@ vi.mock('../config/Connection.js', () => ({
     },
 }));
 
-vi.mock('../service/generatePath.js', () => ({
+vi.mock('../../service/generatePath.js', () => ({
     generatePath: vi.fn(),
 }));
 
