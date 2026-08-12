@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getFileIcon } from "../../src/helperFunction/getFileIcon";
+import { getFileIcon } from "../../../src/helperFunction/getFileIcon";
 
 describe("getFileIcon", () => {
   describe("success", () => {

@@ -4,7 +4,7 @@ import {
   loginSchema,
   SignupPayload,
   signupSchema,
-} from "../../src/schema/auth";
+} from "../../../src/schema/auth";
 
 describe("loginSchema", () => {
   let payload: LoginPayload;

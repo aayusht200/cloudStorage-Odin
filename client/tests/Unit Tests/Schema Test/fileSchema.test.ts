@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { uploadFormSchema } from "../../src/schema/file.ts";
+import { uploadFormSchema } from "../../../src/schema/file.ts";
 describe("uploadFormSchema", () => {
   describe("success", () => {
     it("should accept a valid file", () => {

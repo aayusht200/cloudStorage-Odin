@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createFolderSchema } from "../../src/schema/folder";
+import { createFolderSchema } from "../../../src/schema/folder";
 
 describe("createFolderSchema", () => {
   describe("success", () => {
