@@ -17,7 +17,9 @@
     "scripts": {
         "test": "vitest",
         "coverage-server": "npm --workspace server test -- --coverage",
-        "test-ui": "npx --workspace server vitest --ui"
+        "test-ui-server": "npx --workspace server vitest --ui",
+        "coverage-client": "npm --workspace client test -- --coverage",
+        "test-ui-client": "npx --workspace client vitest --ui"
     },
     "private": true,
     "workspaces": [
