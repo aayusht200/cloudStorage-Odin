@@ -57,6 +57,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 - Download fallback for files without inline preview support
 - Schema-driven form and request validation with Zod
 - Unit and integration tested backend controllers, routes, validation middleware, and Zod schemas with Vitest and Supertest
+- Unit tested frontend schemas, helpers, API services, and React Router loaders with Vitest
 - Light, dark, and system theme toggle
 - Responsive drive grid and form layouts
 
@@ -68,7 +69,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 | Backend | Node.js, Express, Passport.js, Express Session, connect-pg-simple, Multer, Zod, bcrypt |
 | Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
 | Storage | AWS SDK for S3-compatible object storage |
-| Testing | Vitest, Supertest |
+| Testing | Vitest, Supertest, V8 coverage |
 | Tooling | ESLint, Prettier, Nodemon, Prisma CLI |
 
 ## Project Structure
@@ -84,6 +85,7 @@ cloudStorage-Odin/
 - `client/src/service`: Axios API client and request helpers for auth, folders, files, upload, and deletion.
 - `client/src/loaders`: React Router loaders for authentication redirects and drive/file data fetching.
 - `client/src/schema`: Zod schemas and inferred payload types used for form validation and service contracts.
+- `client/tests`: Vitest unit tests for schemas, helpers, API services, and React Router loaders.
 - `server/routes`: Express routers for user, folder, and file endpoints.
 - `server/controller`: request handlers for authentication, folder operations, and file operations.
 - `server/schema`: Zod schemas used by reusable validation middleware for request bodies, route parameters, and uploaded files.
@@ -169,6 +171,7 @@ npm run dev
 | `client` | `npm run lint` | Run ESLint |
 | `client` | `npm run preview` | Preview the production frontend build |
 | `client` | `npm test` | Run Vitest |
+| `client` | `npm test -- --coverage --run --environment node` | Run current non-React frontend unit tests with coverage |
 | `server` | `npm run dev` | Start the API with Nodemon |
 | `server` | `npm start` | Start the API with Node |
 | `server` | `npm test` | Run backend Vitest tests |
@@ -177,7 +180,7 @@ npm run dev
 | root | `npm run coverage` | Run backend coverage from the workspace root |
 | root | `npm run test-ui` | Open the Vitest UI for the backend workspace |
 
-The latest backend coverage run reports 140 passing tests across 10 test files.
+The latest backend coverage run reports 140 passing tests across 10 test files. The current frontend non-React unit test phase reports 57 passing tests across 18 test files.
 
 ## Environment Variables
 
@@ -240,7 +243,9 @@ Controllers return explicit client errors for expected cases such as duplicate u
 
 ## Testing
 
-Backend tests use Vitest in a Node environment. Tests are organized under `server/Tests`, with unit tests under `server/Tests/Unit Test` and HTTP integration tests under `server/Tests/Integration`.
+### Backend Testing
+
+Backend tests use Vitest, Supertest, and V8 coverage in a Node environment. Tests are organized under `server/Tests`, with unit tests under `server/Tests/Unit Test` and HTTP integration tests under `server/Tests/Integration`.
 
 | Test type | Current coverage |
 | --- | --- |
@@ -260,6 +265,38 @@ Latest backend coverage:
 | Functions | 96.66% |
 | Lines | 94.85% |
 
+### Frontend Testing
+
+The current frontend unit-testing phase is complete for non-React application logic. Tests cover Zod schemas, helper functions, API services, and React Router loaders.
+
+| Area | Covered |
+| --- | --- |
+| Zod schemas | Auth, file, and folder schemas |
+| Helper functions | `getFileIcon` |
+| API services | `authenticate`, `createFolder`, `deleteFile`, `deleteFolder`, `getFile`, `getFolder`, `login`, `logout`, `signup`, `upload` |
+| React Router loaders | `authRedirectLoader`, `driveLoader`, `filesLoader`, `rootLoader` |
+
+The frontend tests use Vitest, V8 coverage, Axios/service mocking, and React Router dependency mocking.
+
+Verified command:
+
+```bash
+npm test -- --coverage --run --environment node
+```
+
+Current coverage for the tested non-React source areas:
+
+| Metric | Coverage |
+| --- | --- |
+| Statements | 100% |
+| Branches | 100% |
+| Functions | 100% |
+| Lines | 100% |
+
+This is not complete frontend coverage. React components, context/providers, pages, and router-level frontend integration behavior are not covered yet.
+
+> Note: the normal frontend coverage command using the configured jsdom environment currently fails in this environment because of a jsdom dependency `ERR_REQUIRE_ESM`. The non-React frontend unit suite was verified with the Node environment instead.
+
 ## Deployment
 
 | Layer | Production Service |
@@ -269,7 +306,7 @@ Latest backend coverage:
 | Database | Supabase PostgreSQL |
 | File storage | S3-compatible object storage |
 
-The client includes `client/vercel.json` to route Vercel requests to `index.html` for client-side routing.
+The root `vercel.json` routes `/api/:path*` requests to the Render backend and rewrites other requests to `index.html` for client-side routing.
 Incoming API payloads are validated with Zod middleware before reaching controllers.
 
 ## Challenges
@@ -285,7 +322,7 @@ Incoming API payloads are validated with Zod middleware before reaching controll
 
 ## Current Project Status
 
-The project has a working full-stack implementation with session authentication, nested folders, file upload and deletion, signed file URLs, Zod validation, Prisma migrations, and backend unit/integration tests with coverage reporting.
+The project has a working full-stack implementation with session authentication, nested folders, file upload and deletion, signed file URLs, Zod validation, Prisma migrations, backend unit/integration tests, and frontend unit tests for current non-React application logic.
 
 ## Future Improvements
 
@@ -294,7 +331,11 @@ The project has a working full-stack implementation with session authentication,
 - File and folder rename support
 - Search across files and folders
 - Dedicated download action for all file types
-- Expand test coverage for storage/service edge cases and frontend React components.
+- UserProvider/context testing
+- React component testing
+- Page-level testing
+- Frontend/router integration testing
+- CI/CD
 - Improved empty states and loading states
 
 ## License
