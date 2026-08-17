@@ -53,13 +53,21 @@ export function Login() {
             <HoverCardReadme />
           </CardDescription>
           <CardAction>
-            <Button variant="link" onClick={() => navigate("/signup")}>
+            <Button
+              variant="link"
+              onClick={() => navigate("/signup")}
+              aria-label="signup-button"
+            >
               Sign Up
             </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
+          <form
+            onSubmit={handleSubmit(onSubmit, onError)}
+            noValidate
+            aria-label="Login form"
+          >
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -68,6 +76,7 @@ export function Login() {
                   type="email"
                   placeholder="example@email.com"
                   {...register("email")}
+                  aria-describedby={errors.email ? "email-error" : undefined}
                 />
                 {errors.email && (
                   <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
@@ -83,6 +92,9 @@ export function Login() {
                   id="password"
                   type="password"
                   {...register("password")}
+                  aria-describedby={
+                    errors.password ? "password-error" : undefined
+                  }
                 />
                 {errors.password && (
                   <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
@@ -90,7 +102,9 @@ export function Login() {
                   </span>
                 )}
               </div>
-              {error && <p>Invalid email or password</p>}
+              {error && (
+                <p aria-label="form-error">Invalid email or password</p>
+              )}
               <Button
                 disabled={isSubmitting}
                 type="submit"
