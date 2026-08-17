@@ -24,10 +24,13 @@ export const UserProvider = ({ children, initialUser }: UserProviderProps) => {
     await revalidate();
   };
   const logoutUser = async () => {
-    await logout();
-    setUser(defaultUser);
-    await revalidate();
-    navigate("/", { replace: true });
+    try {
+      await logout();
+    } finally {
+      setUser(defaultUser);
+      await revalidate();
+      navigate("/", { replace: true });
+    }
   };
 
   const signupUser = async ({
@@ -36,16 +39,12 @@ export const UserProvider = ({ children, initialUser }: UserProviderProps) => {
     firstName,
     lastName,
   }: SignupPayload) => {
-    try {
-      await signup({
-        email,
-        password,
-        firstName,
-        lastName,
-      });
-    } catch (error) {
-      throw error;
-    }
+    await signup({
+      email,
+      password,
+      firstName,
+      lastName,
+    });
   };
 
   return (
