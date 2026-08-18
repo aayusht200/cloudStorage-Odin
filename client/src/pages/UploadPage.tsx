@@ -1,10 +1,6 @@
 import { File } from "lucide-react";
 import { useState } from "react";
-import {
-  useForm,
-  type SubmitErrorHandler,
-  type SubmitHandler,
-} from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { useLoaderData, useNavigate } from "react-router";
 import { Button } from "../components/ui/button";
 import {
@@ -53,7 +49,6 @@ function UploadPage() {
       setError("Upload failed");
     }
   };
-  const onError: SubmitErrorHandler<UploadFormValues> = () => setError("");
 
   return (
     <div className="flex h-dvh flex-col">
@@ -71,7 +66,7 @@ function UploadPage() {
           </CardHeader>
           <CardContent className="grid h-full">
             <form
-              onSubmit={handleSubmit(onSubmit, onError)}
+              onSubmit={handleSubmit(onSubmit)}
               encType="multipart/form-data"
               aria-label="Upload form"
             >
