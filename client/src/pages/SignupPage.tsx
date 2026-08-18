@@ -66,6 +66,9 @@ export default function SignupPage() {
                   type="text"
                   placeholder="Adam"
                   {...register("firstName")}
+                  aria-describedby={
+                    errors.firstName ? "error-firstName" : undefined
+                  }
                 />
                 {errors.firstName && (
                   <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
@@ -80,6 +83,9 @@ export default function SignupPage() {
                   type="text"
                   placeholder="Cole"
                   {...register("lastName")}
+                  aria-describedby={
+                    errors.lastName ? "error-lastName" : undefined
+                  }
                 />
                 {errors.lastName && (
                   <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
@@ -94,6 +100,7 @@ export default function SignupPage() {
                   type="email"
                   placeholder="example@email.com"
                   {...register("email")}
+                  aria-describedby={errors.email ? "error-email" : undefined}
                 />
                 {errors.email && (
                   <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
@@ -109,6 +116,9 @@ export default function SignupPage() {
                   id="password"
                   type="password"
                   {...register("password")}
+                  aria-describedby={
+                    errors.password ? "error-password" : undefined
+                  }
                 />
                 {errors.password && (
                   <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
@@ -117,7 +127,7 @@ export default function SignupPage() {
                 )}
               </div>
               {error && (
-                <p>
+                <p aria-label="form-error">
                   User already exists
                   <Button variant="link" onClick={() => navigate("/login")}>
                     Login
