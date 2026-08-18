@@ -63,7 +63,6 @@ app.use('/api/files', fileRoutes);
 app.use('/api/folders', folderRoutes);
 
 app.use((err, _req, res, _next) => {
-    console.error(err);
     res.status(err.status || 500).json({
         message: err.message || 'Internal Server Error',
     });
