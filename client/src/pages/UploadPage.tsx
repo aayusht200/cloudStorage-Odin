@@ -25,21 +25,21 @@ type UploadFormValues = {
 };
 function UploadPage() {
   const drive = useLoaderData<typeof driveLoader>();
-  const [_, setError] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<UploadFormValues>();
   const onSubmit: SubmitHandler<UploadFormValues> = async (data) => {
-    setError(false);
+    setError("");
     try {
       const file = data.file.item(0);
 
       const result = uploadFormSchema.safeParse({ file });
       if (!result.success) {
-        setError(true);
+        setError(result.error.issues[0].message);
         return;
       }
 
@@ -50,10 +50,10 @@ function UploadPage() {
 
       navigate(`/drive/${drive.id}`);
     } catch {
-      setError(true);
+      setError("Upload failed");
     }
   };
-  const onError: SubmitErrorHandler<UploadFormValues> = () => setError(false);
+  const onError: SubmitErrorHandler<UploadFormValues> = () => setError("");
 
   return (
     <div className="flex h-dvh flex-col">
@@ -64,20 +64,23 @@ function UploadPage() {
             <CardTitle>CloudDrive</CardTitle>
             <CardDescription>
               Upload to
-              {drive.folderName.toUpperCase()[0] + drive.folderName.slice(1)}
+              {" " +
+                drive.folderName.toUpperCase()[0] +
+                drive.folderName.slice(1)}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid h-full">
             <form
               onSubmit={handleSubmit(onSubmit, onError)}
               encType="multipart/form-data"
+              aria-label="Upload form"
             >
               <div className="grid h-full items-center justify-center">
                 <Label htmlFor="file">
                   <File /> Chose File
                 </Label>
                 <Input id="file" type="file" {...register("file")} />
-                {errors.file?.message && <p>{errors.file.message}</p>}
+                {error && <p aria-label="form-error">{error}</p>}
                 <Button
                   disabled={isSubmitting}
                   type="submit"
