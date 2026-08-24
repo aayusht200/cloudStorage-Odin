@@ -48,7 +48,7 @@ describe("CreateFolderPage", () => {
       loginUser: vi.fn(),
       logoutUser: vi.fn(),
       signupUser: vi.fn(),
-      isLoggedIn: false,
+      isLoggedIn: true,
     };
   });
   describe("Initial Render", () => {
