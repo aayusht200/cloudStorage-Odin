@@ -58,7 +58,10 @@ export function CreateFolder() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit, onError)}>
+            <form
+              onSubmit={handleSubmit(onSubmit, onError)}
+              aria-label="Create Folder"
+            >
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="folderName">Folder Name</Label>
@@ -67,14 +70,24 @@ export function CreateFolder() {
                     type="text"
                     placeholder="Photos"
                     {...register("folderName")}
+                    aria-describedby={
+                      errors.folderName ? "error-folderName" : undefined
+                    }
                   />
                   {errors.folderName && (
-                    <span className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
+                    <span
+                      id="error-folderName"
+                      className="flex items-center gap-2 text-sm leading-none font-medium text-red-600 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+                    >
                       {errors.folderName.message}
                     </span>
                   )}
                 </div>
-                {error && <p>Folder with same name exists as this location.</p>}
+                {error && (
+                  <p aria-label="form-error">
+                    Folder with same name exists as this location.
+                  </p>
+                )}
                 <Button
                   disabled={isSubmitting}
                   type="submit"
