@@ -33,9 +33,11 @@ function FilesPage() {
                 try {
                   await navigator.clipboard.writeText(file.url);
                 } catch {
-                  alert("Copy failed tryagain!");
+                  alert("Copy failed try again!");
                 }
               }}
+              id="copyLink"
+              aria-label="Copy file link"
             >
               <Share2 />
             </Button>
@@ -52,6 +54,8 @@ function FilesPage() {
                   alert(error);
                 }
               }}
+              id="deleteFile"
+              aria-label="Delete file"
             >
               <Trash2 />
             </Button>
