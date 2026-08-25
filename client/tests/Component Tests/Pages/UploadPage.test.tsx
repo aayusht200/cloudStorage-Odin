@@ -136,7 +136,7 @@ describe("UploadPage", () => {
   describe("form-errors", () => {
     it("should show error on incorrect type upload", async () => {
       //Arrange
-      const file = new File(["test image content"], "fileName.png", {
+      const file = new File(["test image content"], "fileName.test", {
         type: "image/test",
       });
       render(
