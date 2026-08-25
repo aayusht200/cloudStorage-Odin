@@ -1,37 +1,48 @@
 import request from 'supertest';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { app } from '../../app.js';
+import { cleanupTestUsers, createAuthenticatedAgent } from './testUtils.js';
+
 describe('File routes', () => {
     let agent;
-    let userPayload;
     let folderId;
     let filePath;
     let fileId;
+    let createdEmails;
 
     beforeEach(() => {
         agent = request.agent(app);
-        folderId = '28860744-fae5-4514-a7d1-2afe05d8b99f';
-        userPayload = {
-            email: 'testuser@gmail.com',
-            password: 'Test@123',
-        };
+        folderId = crypto.randomUUID();
         filePath = '/Users/aayushtrivedi/Downloads/cloudStorage-Odin/screenshot/emptyDrive.png';
-        fileId = '8f6be4a4-2612-4ac3-8a96-cf2f13aeaed2';
+        fileId = crypto.randomUUID();
+        createdEmails = [];
     });
+
+    afterEach(async () => {
+        await cleanupTestUsers(createdEmails);
+    });
+
+    const authenticate = async () => {
+        const auth = await createAuthenticatedAgent();
+        agent = auth.agent;
+        folderId = auth.rootFolderId;
+        createdEmails.push(auth.payload.email);
+    };
+
+    const uploadTestFile = async () => {
+        return agent.post('/api/files/create').field('folderId', folderId).attach('file', filePath);
+    };
 
     describe('POST /api/files/create', () => {
         describe('success', () => {
             it('should upload a file', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send(userPayload);
+                await authenticate();
                 // Create/identify a valid folder
                 // Act
                 // Send multipart request with file
-                const createResponse = await agent
-                    .post('/api/files/create')
-                    .field('folderId', folderId)
-                    .attach('file', filePath);
+                const createResponse = await uploadTestFile();
                 // Assert
                 expect(createResponse.status).toBe(201);
                 expect(createResponse.body).toEqual({ message: 'File uploaded sucessfully' });
@@ -57,7 +68,7 @@ describe('File routes', () => {
             it('should reject a request without a file', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send(userPayload);
+                await authenticate();
                 // Create/identify a valid folder
                 // Act
                 // Send multipart request with file
@@ -70,7 +81,7 @@ describe('File routes', () => {
             it('should reject invalid file input', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send(userPayload);
+                await authenticate();
                 // Create/identify a valid folder
                 // Act
                 // Send multipart request with file
@@ -86,7 +97,7 @@ describe('File routes', () => {
             it('should reject an invalid folder id', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send(userPayload);
+                await authenticate();
                 // Create/identify a valid folder
                 // Act
                 // Send multipart request with file
@@ -106,7 +117,8 @@ describe('File routes', () => {
             it('should return the file', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send(userPayload);
+                await authenticate();
+                await uploadTestFile();
                 const infoResponse = await agent.get(`/api/folders/${folderId}`);
                 // Act
                 const response = await agent.get(`/api/files/${infoResponse.body.files[0].id}`);
@@ -139,7 +151,7 @@ describe('File routes', () => {
             it('should reject an invalid file id', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send(userPayload);
+                await authenticate();
                 // Act
                 const response = await agent.get(`/api/files/undefined`);
                 // Assert
@@ -150,7 +162,7 @@ describe('File routes', () => {
             it('should return 404 when the file does not exist', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send(userPayload);
+                await authenticate();
                 // Act
                 const response = await agent.get(`/api/files/${crypto.randomUUID()}`);
                 // Assert
@@ -165,8 +177,8 @@ describe('File routes', () => {
             it('should delete the file', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send(userPayload);
-                await agent.post('/api/files/create').field('folderId', folderId).attach('file', filePath);
+                await authenticate();
+                await uploadTestFile();
                 const infoResponse = await agent.get(`/api/folders/${folderId}`);
                 // Act
                 const response = await agent.delete(`/api/files/${infoResponse.body.files[0].id}`);
@@ -193,7 +205,7 @@ describe('File routes', () => {
             it('should reject an invalid file id', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send(userPayload);
+                await authenticate();
                 // Act
                 const response = await agent.delete(`/api/files/undefined`);
                 // Assert
@@ -204,7 +216,7 @@ describe('File routes', () => {
             it('should return 404 when the file does not exist', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send(userPayload);
+                await authenticate();
                 // Act
                 const response = await agent.delete(`/api/files/${crypto.randomUUID()}`);
                 // Assert

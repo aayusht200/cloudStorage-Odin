@@ -1,28 +1,40 @@
 import request from 'supertest';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { app } from '../../app.js';
+import { cleanupTestUsers, createAuthenticatedAgent } from './testUtils.js';
+
 describe('Folder routes', () => {
     let agent;
     let payload;
+    let createdEmails;
 
     beforeEach(() => {
         agent = request.agent(app);
+        createdEmails = [];
 
         payload = {
             folderName: `Test Folder ${crypto.randomUUID()}`,
-            parentId: '28860744-fae5-4514-a7d1-2afe05d8b99f',
+            parentId: crypto.randomUUID(),
         };
     });
+
+    afterEach(async () => {
+        await cleanupTestUsers(createdEmails);
+    });
+
+    const authenticate = async () => {
+        const auth = await createAuthenticatedAgent();
+        agent = auth.agent;
+        payload.parentId = auth.rootFolderId;
+        createdEmails.push(auth.payload.email);
+    };
 
     describe('POST /api/folders/create', () => {
         describe('success', () => {
             it('should create a folder', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send({
-                    email: 'testuser@gmail.com',
-                    password: 'Test@123',
-                });
+                await authenticate();
                 // Act
                 const createResponse = await agent.post('/api/folders/create').send(payload);
                 // Assert
@@ -44,10 +56,7 @@ describe('Folder routes', () => {
 
             it('should reject invalid input', async () => {
                 // Login using agent
-                await agent.post('/api/users/login').send({
-                    email: 'testuser@gmail.com',
-                    password: 'Test@123',
-                });
+                await authenticate();
                 // Act
                 const createResponse = await agent
                     .post('/api/folders/create')
@@ -59,10 +68,7 @@ describe('Folder routes', () => {
 
             it('should reject a duplicate folder name', async () => {
                 // Login using agent
-                await agent.post('/api/users/login').send({
-                    email: 'testuser@gmail.com',
-                    password: 'Test@123',
-                });
+                await authenticate();
                 // Act
                 await agent.post('/api/folders/create').send(payload);
                 const secondCreateReq = await agent.post('/api/folders/create').send(payload);
@@ -78,10 +84,7 @@ describe('Folder routes', () => {
             it('should return the folder', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send({
-                    email: 'testuser@gmail.com',
-                    password: 'Test@123',
-                });
+                await authenticate();
                 // Act
                 const createResponse = await agent.post('/api/folders/create').send(payload);
                 // Assert
@@ -115,10 +118,7 @@ describe('Folder routes', () => {
             it('should reject an invalid folder id', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send({
-                    email: 'testuser@gmail.com',
-                    password: 'Test@123',
-                });
+                await authenticate();
                 // Act
                 const infoResponse = await agent.get(`/api/folders/undefined`);
                 // Assert
@@ -130,10 +130,7 @@ describe('Folder routes', () => {
 
             it('should return 404 when the folder does not exist', async () => {
                 // Arrange
-                await agent.post('/api/users/login').send({
-                    email: 'testuser@gmail.com',
-                    password: 'Test@123',
-                });
+                await authenticate();
                 // Act
                 const infoResponse = await agent.get(`/api/folders/${crypto.randomUUID()}`);
                 // Assert
@@ -147,10 +144,7 @@ describe('Folder routes', () => {
         describe('success', () => {
             it('should delete the folder', async () => {
                 // Arrange
-                await agent.post('/api/users/login').send({
-                    email: 'testuser@gmail.com',
-                    password: 'Test@123',
-                });
+                await authenticate();
                 const createResponse = await agent.post('/api/folders/create').send(payload);
                 // Act
                 const deleteResponse = await agent.delete(`/api/folders/${createResponse.body.id}`);
@@ -174,10 +168,7 @@ describe('Folder routes', () => {
             it('should reject an invalid folder id', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send({
-                    email: 'testuser@gmail.com',
-                    password: 'Test@123',
-                });
+                await authenticate();
                 // Act
                 const deleteResponse = await agent.delete(`/api/folders/undefined`);
                 // Assert
@@ -190,10 +181,7 @@ describe('Folder routes', () => {
             it('should return 404 when the folder does not exist', async () => {
                 // Arrange
                 // Login using agent
-                await agent.post('/api/users/login').send({
-                    email: 'testuser@gmail.com',
-                    password: 'Test@123',
-                });
+                await authenticate();
                 // Act
                 const deleteResponse = await agent.delete(`/api/folders/${crypto.randomUUID()}`);
                 // Assert

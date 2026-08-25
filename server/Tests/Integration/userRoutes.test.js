@@ -1,23 +1,30 @@
 import request from 'supertest';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { app } from '../../app.js';
+import { cleanupTestUsers, createTestUser, makeTestUserPayload } from './testUtils.js';
 
 describe('User routes', () => {
+    let createdEmails;
+
+    beforeEach(() => {
+        createdEmails = [];
+    });
+
+    afterEach(async () => {
+        await cleanupTestUsers(createdEmails);
+    });
+
     describe('POST /api/users/signup', () => {
         let payload;
 
         beforeEach(() => {
-            payload = {
-                email: `test-${crypto.randomUUID()}@gmail.com`,
-                password: 'Test@123',
-                firstName: 'Test',
-                lastName: 'User',
-            };
+            payload = makeTestUserPayload();
         });
         describe('success', () => {
             it('should create a new user', async () => {
                 // Act
                 const response = await request(app).post('/api/users/signup').send(payload);
+                createdEmails.push(payload.email);
 
                 // Assert
 
@@ -41,10 +48,11 @@ describe('User routes', () => {
             });
 
             it('should reject an existing user', async () => {
+                // Arrange
+                const existingUser = await createTestUser();
+                createdEmails.push(existingUser.email);
                 // Act
-                const response = await request(app)
-                    .post('/api/users/signup')
-                    .send({ ...payload, email: 'james.bond@gmail.com' });
+                const response = await request(app).post('/api/users/signup').send({ ...payload, email: existingUser.email });
                 // Assert
                 expect(response.status).toBe(409);
                 expect(response.body).toEqual({ message: 'User already exists' });
@@ -55,15 +63,14 @@ describe('User routes', () => {
         let payload;
         let agent;
         beforeEach(() => {
-            payload = {
-                email: 'james.bond@gmail.com',
-                password: 'James@123',
-            };
+            payload = makeTestUserPayload();
             agent = request.agent(app);
         });
         describe('success', () => {
             it('should return the authenticated user', async () => {
                 // Act
+                await createTestUser(payload);
+                createdEmails.push(payload.email);
                 const loginResponse = await agent.post('/api/users/login').send(payload);
                 const response = await agent.get('/api/users/me');
                 // Assert
@@ -84,7 +91,9 @@ describe('User routes', () => {
         describe('failure', () => {
             it('should return 401 when the user is not authenticated', async () => {
                 // Arrange
-                const loginResponse = await agent.post('/api/users/login').send({ ...payload, password: 'Test@123' });
+                await createTestUser(payload);
+                createdEmails.push(payload.email);
+                const loginResponse = await agent.post('/api/users/login').send({ ...payload, password: 'Test@1234' });
                 const response = await agent.get('/api/users/me');
                 // Assert
                 expect(response.status).toBe(401);
@@ -103,14 +112,13 @@ describe('User routes', () => {
     describe('POST /api/users/login', () => {
         let payload;
         beforeEach(() => {
-            payload = {
-                email: 'james.bond@gmail.com',
-                password: 'James@123',
-            };
+            payload = makeTestUserPayload();
         });
         describe('success', () => {
             it('should login the user and create a session', async () => {
                 // Act
+                await createTestUser(payload);
+                createdEmails.push(payload.email);
                 const response = await request(app).post('/api/users/login').send(payload);
                 // Assert
                 expect(response.status).toBe(200);
@@ -122,6 +130,8 @@ describe('User routes', () => {
         describe('failure', () => {
             it('should reject invalid credentials', async () => {
                 // Act
+                await createTestUser(payload);
+                createdEmails.push(payload.email);
                 const response = await request(app)
                     .post('/api/users/login')
                     .send({ ...payload, password: 'Test@1234' });
@@ -150,15 +160,14 @@ describe('User routes', () => {
         beforeEach(() => {
             agent = request.agent(app);
 
-            payload = {
-                email: 'james.bond@gmail.com',
-                password: 'James@123',
-            };
+            payload = makeTestUserPayload();
         });
 
         describe('success', () => {
             it('should logout the authenticated user and destroy the session', async () => {
                 // Arrange
+                await createTestUser(payload);
+                createdEmails.push(payload.email);
                 await agent.post('/api/users/login').send(payload);
                 const response = await agent.get('/api/users/me');
                 const logoutResponse = await agent.post('/api/users/logout');
