@@ -22,7 +22,7 @@ function DrivePage() {
         folderName: folderToDelete.folderName,
         parentId: drive.id,
       });
-      window.location.reload();
+      navigate(0);
     } catch {
       setError(true);
     }
