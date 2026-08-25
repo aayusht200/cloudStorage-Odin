@@ -11,13 +11,13 @@ The server is an Express API for authentication, folders, file metadata, session
 | Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
 | Validation | Zod |
 | Uploads and storage | Multer, AWS SDK S3 client, S3-compatible object storage |
-| Testing | Vitest, V8 coverage |
+| Testing | Vitest, Supertest, V8 coverage |
 
 ## Project Structure
 
 ```text
 server/
-├── Tests/        # Vitest unit tests
+├── Tests/        # Vitest unit tests and Supertest integration tests
 ├── config/       # Prisma, pg pool, Passport, Multer, and S3 client configuration
 ├── controller/   # User, folder, and file request handlers
 ├── middleware/   # Auth guards and reusable Zod validation middleware
@@ -83,8 +83,8 @@ The app allows credentialed CORS requests from `http://localhost:5173`, `http://
 | `npm run dev` | Start the API with Nodemon |
 | `npm start` | Start the API with Node |
 | `npm run generate` | Generate the Prisma client |
-| `npm test` | Run Vitest unit tests |
-| `npm test -- --coverage --run` | Run Vitest with V8 coverage |
+| `npm test` | Run backend Vitest tests |
+| `npm run coverage` | Run Vitest with V8 coverage |
 
 ## API Routes
 
@@ -153,7 +153,7 @@ Multer currently accepts `image/png`, `image/jpeg`, `application/pdf`, `audio/mp
 
 ## Testing
 
-Vitest runs in a Node environment. Tests live in `server/Tests`.
+Vitest runs in a Node environment. Tests live in `server/Tests`, with unit tests under `server/Tests/Unit Test` and HTTP integration tests under `server/Tests/Integration`.
 
 | Test file | Coverage |
 | --- | --- |
@@ -162,17 +162,28 @@ Vitest runs in a Node environment. Tests live in `server/Tests`.
 | `fileSchema.test.js` | File object validation, MIME types, size boundaries, Buffer validation, and id UUID validation |
 | `validateMiddleware.test.js` | Body, params, and file validation success and failure paths |
 | `userController.test.js` | Signup, login, logout, and current-user controller behavior |
+| `folderController.test.js` | Folder creation, retrieval, deletion, ownership, duplicates, and missing-folder paths |
+| `fileController.test.js` | File upload, retrieval, signed URL behavior, deletion, ownership, and missing-file paths |
+| `userRoutes.test.js` | Signup, login/session behavior, `/me`, logout, validation failures, and unauthenticated requests |
+| `folderRoute.test.js` | Authenticated folder create/read/delete flows, validation failures, duplicates, and missing folders |
+| `fileRoute.test.js` | Authenticated file upload/read/delete flows, validation failures, file type handling, and missing files |
 
-Controller tests mock Prisma, bcrypt, Passport, request login/logout/session methods, and response helpers with `vi.mock` and `vi.fn`. Middleware tests use mock request, response, and `next` objects. Schema tests call Zod `parse` and `safeParse` directly.
+Controller tests mock Prisma, bcrypt, Passport, request login/logout/session methods, response helpers, and storage helpers with `vi.mock` and `vi.fn`. Middleware tests use mock request, response, and `next` objects. Schema tests call Zod `parse` and `safeParse` directly. Integration tests use Supertest, including `request.agent(app)` where session and cookie persistence is required.
 
-Latest backend coverage report:
+Integration tests create their required users, folders, files, and uploaded S3-compatible storage objects where needed. Shared utilities in `server/Tests/Integration/testUtils.js` provide fixture creation, authenticated agent setup, and cleanup so tests do not depend on manually persisted development database records.
 
-| Metric | Coverage |
+The integration suite still requires a configured and reachable test/development database, a configured and reachable S3-compatible storage environment, and the existing upload fixture file used by the file route tests.
+
+Latest verified backend result:
+
+| Metric | Result |
 | --- | --- |
-| Statements | 100% |
-| Branches | 100% |
-| Functions | 100% |
-| Lines | 100% |
+| Test files | 10 passed |
+| Tests | 140 passed |
+| Statements | 95.08% |
+| Branches | 84.93% |
+| Functions | 96.66% |
+| Lines | 94.83% |
 
 ## Production
 

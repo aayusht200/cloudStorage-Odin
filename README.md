@@ -57,7 +57,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 - Download fallback for files without inline preview support
 - Schema-driven form and request validation with Zod
 - Unit and integration tested backend controllers, routes, validation middleware, and Zod schemas with Vitest and Supertest
-- Unit tested frontend schemas, helpers, API services, and React Router loaders with Vitest
+- Tested frontend pages, context, schemas, helpers, API services, and React Router loaders with Vitest
 - Light, dark, and system theme toggle
 - Responsive drive grid and form layouts
 
@@ -69,7 +69,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 | Backend | Node.js, Express, Passport.js, Express Session, connect-pg-simple, Multer, Zod, bcrypt |
 | Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
 | Storage | AWS SDK for S3-compatible object storage |
-| Testing | Vitest, Supertest, V8 coverage |
+| Testing | Vitest, Supertest, Testing Library, jsdom, V8 coverage |
 | Tooling | ESLint, Prettier, Nodemon, Prisma CLI |
 
 ## Project Structure
@@ -85,7 +85,7 @@ cloudStorage-Odin/
 - `client/src/service`: Axios API client and request helpers for auth, folders, files, upload, and deletion.
 - `client/src/loaders`: React Router loaders for authentication redirects and drive/file data fetching.
 - `client/src/schema`: Zod schemas and inferred payload types used for form validation and service contracts.
-- `client/tests`: Vitest unit tests for schemas, helpers, API services, and React Router loaders.
+- `client/tests`: Vitest tests for pages, context, schemas, helpers, API services, and React Router loaders.
 - `server/routes`: Express routers for user, folder, and file endpoints.
 - `server/controller`: request handlers for authentication, folder operations, and file operations.
 - `server/schema`: Zod schemas used by reusable validation middleware for request bodies, route parameters, and uploaded files.
@@ -93,7 +93,7 @@ cloudStorage-Odin/
 - `server/config`: database, session, Passport, Multer, and S3-compatible storage configuration.
 - `server/service`: storage helpers for upload, deletion, signed URLs, and path generation.
 - `server/prisma`: Prisma schema and migrations for users, folders, and files.
-- `server/Tests`: Vitest unit and Supertest integration tests for backend schemas, middleware, controllers, and routes.
+- `server/Tests`: Vitest unit and Supertest integration tests for backend schemas, middleware, controllers, and routes, with integration fixtures for users, folders, files, and uploaded objects.
 
 ## Screenshots
 
@@ -171,16 +171,18 @@ npm run dev
 | `client` | `npm run lint` | Run ESLint |
 | `client` | `npm run preview` | Preview the production frontend build |
 | `client` | `npm test` | Run Vitest |
-| `client` | `npm test -- --coverage --run --environment node` | Run current non-React frontend unit tests with coverage |
+| `client` | `npm test -- --coverage --run` | Run frontend tests with V8 coverage |
 | `server` | `npm run dev` | Start the API with Nodemon |
 | `server` | `npm start` | Start the API with Node |
 | `server` | `npm test` | Run backend Vitest tests |
 | `server` | `npm run coverage` | Run backend tests with V8 coverage |
 | root | `npm test` | Run workspace Vitest tests |
-| root | `npm run coverage` | Run backend coverage from the workspace root |
-| root | `npm run test-ui` | Open the Vitest UI for the backend workspace |
+| root | `npm run coverage-client` | Run frontend coverage from the workspace root |
+| root | `npm run coverage-server` | Run backend coverage from the workspace root |
+| root | `npm run test-ui-client` | Open the Vitest UI for the client workspace |
+| root | `npm run test-ui-server` | Open the Vitest UI for the server workspace |
 
-The latest backend coverage run reports 140 passing tests across 10 test files. The current frontend non-React unit test phase reports 57 passing tests across 18 test files.
+The latest verified test run reports 240 passing tests across 37 test files: 140 backend tests and 100 frontend tests.
 
 ## Environment Variables
 
@@ -254,48 +256,52 @@ Backend tests use Vitest, Supertest, and V8 coverage in a Node environment. Test
 
 Controller unit tests mock Prisma, bcrypt, Passport, request/session methods, response helpers, and storage helpers where appropriate. Middleware tests exercise body, params, and file validation. Schema tests cover valid and invalid input, boundary conditions, UUID validation, file upload schema validation, MIME types, password complexity, and email validation.
 
-Supertest is used for HTTP integration testing. Tests use `request.agent(app)` where session and cookie persistence is required across login, authenticated requests, and logout.
+Supertest is used for HTTP integration testing. Tests use `request.agent(app)` where session and cookie persistence is required across login, authenticated requests, and logout. Backend integration tests now create their own required users, folders, files, and uploaded S3-compatible storage objects where needed, then clean up test data afterward instead of depending on manually persisted development database records.
 
-Latest backend coverage:
+Latest verified backend result:
 
-| Metric | Coverage |
+| Metric | Result |
 | --- | --- |
-| Statements | 95.11% |
+| Test files | 10 passed |
+| Tests | 140 passed |
+| Statements | 95.08% |
 | Branches | 84.93% |
 | Functions | 96.66% |
-| Lines | 94.85% |
+| Lines | 94.83% |
+
+The backend integration suite still requires a configured and reachable test/development database, a configured and reachable S3-compatible storage environment, and the existing upload fixture file used by the file route tests.
 
 ### Frontend Testing
 
-The current frontend unit-testing phase is complete for non-React application logic. Tests cover Zod schemas, helper functions, API services, and React Router loaders.
+Frontend tests use Vitest, Testing Library, jsdom, service mocking, React Router dependency mocking, and V8 coverage. The current frontend testing phase covers pages, context, Zod schemas, helper functions, API services, and React Router loaders.
 
 | Area | Covered |
 | --- | --- |
+| Pages | Login, signup, drive, file preview, upload, folder creation, home redirect, and error pages |
+| Context | UserProvider behavior |
 | Zod schemas | Auth, file, and folder schemas |
 | Helper functions | `getFileIcon` |
 | API services | `authenticate`, `createFolder`, `deleteFile`, `deleteFolder`, `getFile`, `getFolder`, `login`, `logout`, `signup`, `upload` |
 | React Router loaders | `authRedirectLoader`, `driveLoader`, `filesLoader`, `rootLoader` |
 
-The frontend tests use Vitest, V8 coverage, Axios/service mocking, and React Router dependency mocking.
-
 Verified command:
 
 ```bash
-npm test -- --coverage --run --environment node
+npm run coverage-client -- --run
 ```
 
-Current coverage for the tested non-React source areas:
+Latest verified frontend result:
 
 | Metric | Coverage |
 | --- | --- |
-| Statements | 100% |
-| Branches | 100% |
-| Functions | 100% |
-| Lines | 100% |
+| Test files | 27 passed |
+| Tests | 100 passed |
+| Statements | 85.71% |
+| Branches | 85.81% |
+| Functions | 76.10% |
+| Lines | 85.92% |
 
-This is not complete frontend coverage. React components, context/providers, pages, and router-level frontend integration behavior are not covered yet.
-
-> Note: the normal frontend coverage command using the configured jsdom environment currently fails in this environment because of a jsdom dependency `ERR_REQUIRE_ESM`. The non-React frontend unit suite was verified with the Node environment instead.
+Pages, loaders, schemas, services, and helpers report 100% coverage in the latest frontend coverage run. Remaining uncovered code is primarily UI infrastructure, third-party-derived UI primitives, and partial context/provider branches rather than missing application workflows.
 
 ## Deployment
 
@@ -322,7 +328,7 @@ Incoming API payloads are validated with Zod middleware before reaching controll
 
 ## Current Project Status
 
-The project has a working full-stack implementation with session authentication, nested folders, file upload and deletion, signed file URLs, Zod validation, Prisma migrations, backend unit/integration tests, and frontend unit tests for current non-React application logic.
+The project has a working full-stack implementation with session authentication, nested folders, file upload and deletion, signed file URLs, Zod validation, Prisma migrations, a backend unit/integration test suite, and frontend tests for pages, context, schemas, helpers, services, and loaders.
 
 ## Future Improvements
 
@@ -331,11 +337,8 @@ The project has a working full-stack implementation with session authentication,
 - File and folder rename support
 - Search across files and folders
 - Dedicated download action for all file types
-- UserProvider/context testing
-- React component testing
-- Page-level testing
-- Frontend/router integration testing
 - CI/CD
+- Maintain and expand tests as new UI and API features are added
 - Improved empty states and loading states
 
 ## License
