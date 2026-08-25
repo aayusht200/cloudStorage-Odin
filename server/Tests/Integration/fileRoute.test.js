@@ -10,13 +10,13 @@ describe('File routes', () => {
 
     beforeEach(() => {
         agent = request.agent(app);
-        folderId = '4b800afd-8113-4f9b-a963-9a42f5f215cd';
+        folderId = '28860744-fae5-4514-a7d1-2afe05d8b99f';
         userPayload = {
             email: 'testuser@gmail.com',
             password: 'Test@123',
         };
         filePath = '/Users/aayushtrivedi/Downloads/cloudStorage-Odin/screenshot/emptyDrive.png';
-        fileId = '09d8732b-f86d-4f61-b50f-9d88caf76110';
+        fileId = '8f6be4a4-2612-4ac3-8a96-cf2f13aeaed2';
     });
 
     describe('POST /api/files/create', () => {

@@ -10,7 +10,7 @@ describe('Folder routes', () => {
 
         payload = {
             folderName: `Test Folder ${crypto.randomUUID()}`,
-            parentId: '4b800afd-8113-4f9b-a963-9a42f5f215cd',
+            parentId: '28860744-fae5-4514-a7d1-2afe05d8b99f',
         };
     });
 
