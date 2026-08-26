@@ -58,6 +58,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 - Schema-driven form and request validation with Zod
 - Unit and integration tested backend controllers, routes, validation middleware, and Zod schemas with Vitest and Supertest
 - Tested frontend pages, context, schemas, helpers, API services, and React Router loaders with Vitest
+- End-to-end browser coverage for auth, theme, folder, and file workflows with Playwright
 - Light, dark, and system theme toggle
 - Responsive drive grid and form layouts
 
@@ -69,7 +70,7 @@ https://github.com/aayusht200/cloudStorage-Odin
 | Backend | Node.js, Express, Passport.js, Express Session, connect-pg-simple, Multer, Zod, bcrypt |
 | Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
 | Storage | AWS SDK for S3-compatible object storage |
-| Testing | Vitest, Supertest, Testing Library, jsdom, V8 coverage |
+| Testing | Vitest, Supertest, Testing Library, jsdom, Playwright, V8 coverage |
 | Tooling | ESLint, Prettier, Nodemon, Prisma CLI |
 
 ## Project Structure
@@ -85,7 +86,7 @@ cloudStorage-Odin/
 - `client/src/service`: Axios API client and request helpers for auth, folders, files, upload, and deletion.
 - `client/src/loaders`: React Router loaders for authentication redirects and drive/file data fetching.
 - `client/src/schema`: Zod schemas and inferred payload types used for form validation and service contracts.
-- `client/tests`: Vitest tests for pages, context, schemas, helpers, API services, and React Router loaders.
+- `client/tests`: Vitest `.test.*` tests for pages, context, schemas, helpers, API services, and React Router loaders, plus Playwright `.spec.ts` E2E tests under `client/tests/E2E`.
 - `server/routes`: Express routers for user, folder, and file endpoints.
 - `server/controller`: request handlers for authentication, folder operations, and file operations.
 - `server/schema`: Zod schemas used by reusable validation middleware for request bodies, route parameters, and uploaded files.
@@ -172,6 +173,7 @@ npm run dev
 | `client` | `npm run preview` | Preview the production frontend build |
 | `client` | `npm test` | Run Vitest |
 | `client` | `npm test -- --coverage --run` | Run frontend tests with V8 coverage |
+| `client` | `npm run test:e2e` | Run Playwright E2E tests |
 | `server` | `npm run dev` | Start the API with Nodemon |
 | `server` | `npm start` | Start the API with Node |
 | `server` | `npm test` | Run backend Vitest tests |
@@ -182,7 +184,7 @@ npm run dev
 | root | `npm run test-ui-client` | Open the Vitest UI for the client workspace |
 | root | `npm run test-ui-server` | Open the Vitest UI for the server workspace |
 
-The latest verified test run reports 240 passing tests across 37 test files: 140 backend tests and 100 frontend tests.
+The latest verified frontend automation reports 116 passing tests: 100 Vitest unit/component tests and 16 Playwright E2E tests. The backend suite separately reports 140 passing Vitest/Supertest tests.
 
 ## Environment Variables
 
@@ -273,7 +275,7 @@ The backend integration suite still requires a configured and reachable test/dev
 
 ### Frontend Testing
 
-Frontend tests use Vitest, Testing Library, jsdom, service mocking, React Router dependency mocking, and V8 coverage. The current frontend testing phase covers pages, context, Zod schemas, helper functions, API services, and React Router loaders.
+Frontend unit and component tests use Vitest, Testing Library, jsdom, service mocking, React Router dependency mocking, and V8 coverage. Vitest tests use the `.test.*` naming convention and cover pages, context, Zod schemas, helper functions, API services, and React Router loaders.
 
 | Area | Covered |
 | --- | --- |
@@ -284,7 +286,7 @@ Frontend tests use Vitest, Testing Library, jsdom, service mocking, React Router
 | API services | `authenticate`, `createFolder`, `deleteFile`, `deleteFolder`, `getFile`, `getFolder`, `login`, `logout`, `signup`, `upload` |
 | React Router loaders | `authRedirectLoader`, `driveLoader`, `filesLoader`, `rootLoader` |
 
-Verified command:
+Verified Vitest command:
 
 ```bash
 npm run coverage-client -- --run
@@ -302,6 +304,13 @@ Latest verified frontend result:
 | Lines | 85.92% |
 
 Pages, loaders, schemas, services, and helpers report 100% coverage in the latest frontend coverage run. Remaining uncovered code is primarily UI infrastructure, third-party-derived UI primitives, and partial context/provider branches rather than missing application workflows.
+
+Playwright E2E tests live under `client/tests/E2E` and use the `.spec.ts` naming convention. The current E2E suite has 16 passing browser tests covering the home page, signup, login, logout, theme switching and persistence, system light/dark behavior, folder creation/navigation/deletion, file upload, file details, share-link copying, and file deletion.
+
+```bash
+cd client
+npm run test:e2e
+```
 
 ## Deployment
 
