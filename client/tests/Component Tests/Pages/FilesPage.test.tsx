@@ -166,7 +166,6 @@ describe("FilesPage", () => {
           </UserContext.Provider>,
         );
         const e = userEvent.setup();
-        const error = new Error("Copy failed try again!");
         const writeTextMock = vi
           .spyOn(navigator.clipboard, "writeText")
           .mockRejectedValue({});

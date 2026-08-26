@@ -1,5 +1,5 @@
 import { act, render } from "@testing-library/react";
-import { useContext } from "react";
+import { createRef, forwardRef, useContext, useImperativeHandle } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   defaultUser,
@@ -11,8 +11,10 @@ import { UserProvider } from "../../../src/context/UserProvider";
 import { login } from "../../../src/service/login";
 import { logout } from "../../../src/service/logout";
 import { signup } from "../../../src/service/signup";
+
 const revalidate = vi.fn().mockResolvedValue(undefined);
 const navigate = vi.fn();
+
 vi.mock("react-router", () => ({
   useNavigate: vi.fn(() => navigate),
   useRevalidator: vi.fn(() => ({
@@ -20,19 +22,25 @@ vi.mock("react-router", () => ({
     state: "idle",
   })),
 }));
+
 vi.mock("../../../src/service/login", () => ({ login: vi.fn() }));
 vi.mock("../../../src/service/logout", () => ({ logout: vi.fn() }));
 vi.mock("../../../src/service/signup", () => ({ signup: vi.fn() }));
-let context: UserContextProps;
-function TestConsumer() {
-  context = useContext(UserContext);
+
+const TestConsumer = forwardRef<UserContextProps>((_, ref) => {
+  const context = useContext(UserContext);
+
+  useImperativeHandle(ref, () => context, [context]);
+
   return null;
-}
+});
+
 describe("UserProvider", () => {
   let user: User;
 
   beforeEach(() => {
     vi.clearAllMocks();
+
     user = {
       id: crypto.randomUUID(),
       email: "test.user@gmail.com",
@@ -42,157 +50,203 @@ describe("UserProvider", () => {
       rootFolderId: crypto.randomUUID(),
     };
   });
+
   describe("Initial state", () => {
     describe("success", () => {
       it("should return default user on initial render", () => {
-        //Arrange
+        // Arrange
+        const contextRef = createRef<UserContextProps>();
+
         render(
           <UserProvider initialUser={null}>
-            <TestConsumer />
+            <TestConsumer ref={contextRef} />
           </UserProvider>,
         );
-        //Assert
-        expect(context.user).toEqual(defaultUser);
-        expect(context.isLoggedIn).toBe(false);
+
+        // Assert
+        expect(contextRef.current?.user).toEqual(defaultUser);
+        expect(contextRef.current?.isLoggedIn).toBe(false);
       });
-      it("should return the initial user when one is provided", async () => {
-        //Arrange
+
+      it("should return the initial user when one is provided", () => {
+        // Arrange
+        const contextRef = createRef<UserContextProps>();
+
         render(
           <UserProvider initialUser={user}>
-            <TestConsumer />
+            <TestConsumer ref={contextRef} />
           </UserProvider>,
         );
-        //Assert
-        expect(context.user).toEqual(user);
-        expect(context.isLoggedIn).toBe(true);
+
+        // Assert
+        expect(contextRef.current?.user).toEqual(user);
+        expect(contextRef.current?.isLoggedIn).toBe(true);
       });
     });
   });
+
   describe("loginUser", () => {
     describe("success", () => {
       it("should set the user on successful login", async () => {
-        //Arrange
+        // Arrange
+        const contextRef = createRef<UserContextProps>();
+
         vi.mocked(login).mockResolvedValue({
           user,
         });
+
         render(
           <UserProvider initialUser={null}>
-            <TestConsumer />
+            <TestConsumer ref={contextRef} />
           </UserProvider>,
         );
-        //Act
+
+        // Act
         await act(async () => {
-          await context.loginUser({ email: user.email, password: "test" });
+          await contextRef.current?.loginUser({
+            email: user.email,
+            password: "test",
+          });
         });
-        //Assert
+
+        // Assert
         expect(login).toHaveBeenCalledWith({
           email: user.email,
           password: "test",
         });
-        expect(context.user).toEqual(user);
+        expect(contextRef.current?.user).toEqual(user);
         expect(revalidate).toHaveBeenCalledTimes(1);
       });
     });
+
     describe("failed", () => {
       it("should preserve default user on failure", async () => {
-        //Arrange
+        // Arrange
+        const contextRef = createRef<UserContextProps>();
         const error = new Error("Invalid credentials");
+
         vi.mocked(login).mockRejectedValue(error);
+
         render(
           <UserProvider initialUser={null}>
-            <TestConsumer />
+            <TestConsumer ref={contextRef} />
           </UserProvider>,
         );
-        //Act + Assert
+
+        // Act + Assert
         await expect(
-          context.loginUser({ email: user.email, password: "" }),
+          contextRef.current?.loginUser({
+            email: user.email,
+            password: "",
+          }),
         ).rejects.toBe(error);
-        expect(context.user).toEqual(defaultUser);
+
+        expect(contextRef.current?.user).toEqual(defaultUser);
         expect(revalidate).not.toHaveBeenCalled();
       });
     });
   });
+
   describe("logoutUser", () => {
     describe("success", () => {
       it("should logout and set user to default user", async () => {
-        //Arrange
+        // Arrange
+        const contextRef = createRef<UserContextProps>();
+
         render(
           <UserProvider initialUser={user}>
-            <TestConsumer />
+            <TestConsumer ref={contextRef} />
           </UserProvider>,
         );
-        //Act
+
+        // Act
         await act(async () => {
-          await context.logoutUser();
+          await contextRef.current?.logoutUser();
         });
-        //Assert
+
+        // Assert
         expect(logout).toHaveBeenCalledTimes(1);
-        expect(context.user).toEqual(defaultUser);
+        expect(contextRef.current?.user).toEqual(defaultUser);
         expect(revalidate).toHaveBeenCalledTimes(1);
         expect(navigate).toHaveBeenCalledWith("/", { replace: true });
       });
     });
+
     describe("failure", () => {
-      it("should clear user and set to default user even on login failure", async () => {
-        //Arrange
+      it("should clear user and set to default user even on logout failure", async () => {
+        // Arrange
+        const contextRef = createRef<UserContextProps>();
         const error = new Error("logout failed");
+
         vi.mocked(logout).mockRejectedValue(error);
+
         render(
           <UserProvider initialUser={user}>
-            <TestConsumer />
+            <TestConsumer ref={contextRef} />
           </UserProvider>,
         );
-        //Act
-        //Assert
+
+        // Act + Assert
         await act(async () => {
-          await expect(context.logoutUser()).rejects.toBe(error);
+          await expect(contextRef.current?.logoutUser()).rejects.toBe(error);
         });
-        expect(context.user).toEqual(defaultUser);
+
+        expect(contextRef.current?.user).toEqual(defaultUser);
         expect(revalidate).toHaveBeenCalled();
         expect(navigate).toHaveBeenCalledWith("/", { replace: true });
       });
     });
   });
+
   describe("signupUser", () => {
     describe("success", () => {
       it("should call signup with data payload", async () => {
-        //Arrange
+        // Arrange
+        const contextRef = createRef<UserContextProps>();
+
         render(
           <UserProvider initialUser={null}>
-            <TestConsumer />
+            <TestConsumer ref={contextRef} />
           </UserProvider>,
         );
-        //Act
-        await context.signupUser({
+
+        // Act
+        await contextRef.current?.signupUser({
           email: user.email,
           password: "test",
           firstName: user.firstName,
           lastName: user.lastName,
         });
-        //Assert
+
+        // Assert
         expect(signup).toHaveBeenCalledWith({
           email: user.email,
           password: "test",
           firstName: user.firstName,
           lastName: user.lastName,
         });
-        expect(context.isLoggedIn).toBe(false);
+        expect(contextRef.current?.isLoggedIn).toBe(false);
       });
     });
+
     describe("failure", () => {
       it("should preserve default user if signup failed", async () => {
-        //Arrange
+        // Arrange
+        const contextRef = createRef<UserContextProps>();
         const error = new Error("signup failed");
+
         vi.mocked(signup).mockRejectedValue(error);
+
         render(
           <UserProvider initialUser={null}>
-            <TestConsumer />
+            <TestConsumer ref={contextRef} />
           </UserProvider>,
         );
-        //Act
+
+        // Act + Assert
         await act(async () => {
           await expect(
-            context.signupUser({
+            contextRef.current?.signupUser({
               email: user.email,
               password: "test",
               firstName: user.firstName,
@@ -200,9 +254,10 @@ describe("UserProvider", () => {
             }),
           ).rejects.toEqual(error);
         });
-        //Assert
-        expect(context.user).toEqual(defaultUser);
-        expect(context.isLoggedIn).toBe(false);
+
+        // Assert
+        expect(contextRef.current?.user).toEqual(defaultUser);
+        expect(contextRef.current?.isLoggedIn).toBe(false);
       });
     });
   });
