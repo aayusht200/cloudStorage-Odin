@@ -1,4 +1,4 @@
-name: lint CI
+name: Client lint CI
 
 on: [push, pull_request]
 
