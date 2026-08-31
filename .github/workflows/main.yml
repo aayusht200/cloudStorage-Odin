@@ -19,6 +19,7 @@ jobs:
             S3_REGION: ${{ vars.S3_REGION }}
             NODE_ENV: ${{ vars.NODE_ENV }}
             PORT: ${{ vars.PORT }}
+            VITE_API_URL: ${{ vars.VITE_API_URL }}
 
         steps:
             - name: Checkout code
