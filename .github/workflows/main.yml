@@ -50,6 +50,9 @@ jobs:
             - name: Run server unit tests
               run: npm --workspace server test -- --run "Tests/Unit Test"
 
+            - name: Generate Prisma client
+              run: npm --workspace server run generate
+
             - name: Run database migrations
               run: npm --workspace server exec prisma migrate deploy
 
