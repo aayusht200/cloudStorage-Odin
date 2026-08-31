@@ -10,11 +10,6 @@ test.describe("files", () => {
   test.beforeEach(async ({ page }) => {
     payload = createSignupPayload();
     await axios.post("http://localhost:3000/api/users/signup", payload);
-    page.on("response", (response) => {
-      if (response.url().includes("/api/")) {
-        console.log("API:", response.status(), response.url());
-      }
-    });
     await page.goto("/login");
     await page.getByRole("textbox", { name: "Email" }).fill(payload.email);
     await page
