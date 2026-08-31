@@ -29,3 +29,6 @@ jobs:
 
             - name: Typecheck client
               run: npm --workspace client run typecheck
+
+            - name: Build client
+              run: npm --workspace client run build
