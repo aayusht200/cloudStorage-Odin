@@ -25,4 +25,4 @@ jobs:
               run: npm --workspace client run lint
 
             - name: Run client tests
-            - run: npm --workspace client run test -- --run
+              run: npm --workspace client run test -- --run
