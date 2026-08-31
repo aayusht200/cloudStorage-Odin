@@ -11,5 +11,8 @@ export default [
             globals: globals.node,
         },
         ...js.configs.recommended,
+        rules: {
+            'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+        },
     },
 ];

@@ -58,14 +58,16 @@ app.use('/api/folders', folderRoutes);
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok' });
 });
-app.use((err, _req, res) => {
+app.use((err, _req, res, _next) => {
     res.status(err.status || 500).json({
         message: err.message || 'Internal Server Error',
     });
 });
 
-app.use((_, res) => {
-    res.status(404).send({ message: 'Invalid route' });
+app.use((_req, res) => {
+    res.status(404).json({
+        message: 'Invalid route',
+    });
 });
 
 export { app };
