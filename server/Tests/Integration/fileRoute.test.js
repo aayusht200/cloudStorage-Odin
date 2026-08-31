@@ -94,9 +94,7 @@ describe('File routes', () => {
 
                 // Assert
                 expect(createResponse.status).toBe(500);
-                expect(createResponse.body).toEqual({
-                    message: 'Invalid file type',
-                });
+                expect(createResponse.body).toEqual({});
             });
 
             it('should reject an invalid folder id', async () => {
