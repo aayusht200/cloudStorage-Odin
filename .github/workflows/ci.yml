@@ -1,4 +1,4 @@
-name: Client lint CI
+name: Client CI
 
 on:
     push:
@@ -26,3 +26,6 @@ jobs:
 
             - name: Run client tests
               run: npm --workspace client run test -- --run
+
+            - name: Typecheck client
+              run: npm --workspace client run typecheck
