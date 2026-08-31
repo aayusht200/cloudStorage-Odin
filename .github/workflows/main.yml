@@ -65,13 +65,13 @@ jobs:
 
             - name: Start server
               run: npm --workspace server run dev &
-              
+
             - name: Wait for server
               run: |
-                until curl --silent --fail http://localhost:3000/health; do
-                  echo "Waiting for server..."
-                  sleep 1
-                done
+                  until curl --silent --fail http://localhost:3000/health; do
+                    echo "Waiting for server..."
+                    sleep 1
+                  done
 
             - name: Run E2E tests
-              run: npm --workspace client run test:e2e
+              run: npm --workspace client run test:e2e -- --workers=1
