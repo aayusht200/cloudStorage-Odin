@@ -63,15 +63,15 @@ jobs:
             - name: Run server integration tests
               run: npm --workspace server run test -- --run "Tests/Integration"
 
-            # - name: Start server
-            #   run: npm --workspace server run dev &
+            - name: Start server
+              run: npm --workspace server run dev &
               
-            # - name: Wait for server
-            #   run: |
-            #     until curl --silent --fail http://localhost:3000/health; do
-            #       echo "Waiting for server..."
-            #       sleep 1
-            #     done
+            - name: Wait for server
+              run: |
+                until curl --silent --fail http://localhost:3000/health; do
+                  echo "Waiting for server..."
+                  sleep 1
+                done
 
-            # - name: Run E2E tests
-            #   run: npm --workspace client run test:e2e
+            - name: Run E2E tests
+              run: npm --workspace client run test:e2e
