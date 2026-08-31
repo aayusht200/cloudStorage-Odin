@@ -1,0 +1,2 @@
+test.png   → image/png       → allowed  → success
+test.txt   → text/plain      → rejected → failure

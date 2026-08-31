@@ -90,11 +90,13 @@ describe('File routes', () => {
                 const createResponse = await agent
                     .post('/api/files/create')
                     .field('folderId', folderId)
-                    .attach('file', path.join(__dirname, 'Test.mov'));
+                    .attach('file', path.join(__dirname, 'test.txt'));
 
                 // Assert
-                expect(createResponse.status).toBe(500);
-                expect(createResponse.body).toEqual({});
+                expect(createResponse.status).toBe(400);
+                expect(createResponse.body.errors.fieldErrors.mimetype).toEqual([
+                    'Invalid option: expected one of "image/png"|"image/jpeg"|"image/webp"|"application/pdf"|"audio/mpeg"|"video/mp4"',
+                ]);
             });
 
             it('should reject an invalid folder id', async () => {
