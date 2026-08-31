@@ -21,7 +21,12 @@ export const UserProvider = ({ children, initialUser }: UserProviderProps) => {
   const loginUser = async ({ email, password }: LoginPayload) => {
     const verifiedUser = await login({ email, password });
     setUser(verifiedUser.user);
+    console.log("before revalidate");
+
     await revalidate();
+
+    console.log("after revalidate");
+    navigate("/");
   };
   const logoutUser = async () => {
     try {
