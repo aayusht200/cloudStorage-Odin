@@ -36,6 +36,32 @@ jobs:
             - name: Install Playwright browsers
               run: npm --workspace client exec playwright install --with-deps chromium
 
+            - name: Run client lint
+              run: npm --workspace client run lint
+
+            # - name: Run client tests
+            #   run: npm --workspace client run test -- --run
+
+            - name: Typecheck client
+              run: npm --workspace client run typecheck
+
+            - name: Build client
+              run: npm --workspace client run build
+
+            - name: Generate Prisma client
+              run: npm --workspace server run generate
+
+            - name: Run database migrations
+              run: npm --workspace server exec prisma migrate deploy
+
+            # - name: Run server lint
+            #   run: npm --workspace server run lint
+
+            # - name: Run server unit tests
+            #   run: npm --workspace server test -- --run "Tests/Unit Test"
+
+            # - name: Run server integration tests
+            #   run: npm --workspace server run test -- --run "Tests/Integration"
 
             - name: Start server
               run: npm --workspace server run dev &
