@@ -10,7 +10,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test tests/E2E/login.spec.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
