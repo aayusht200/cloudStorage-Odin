@@ -58,3 +58,9 @@ jobs:
 
             - name: Run server integration tests
               run: npm --workspace server run test -- --run "Tests/Integration"
+
+            - name: Start server
+              run: npm --workspace server run dev &
+              
+            - name: Run E2E tests
+              run: npm --workspace client run test:e2e
