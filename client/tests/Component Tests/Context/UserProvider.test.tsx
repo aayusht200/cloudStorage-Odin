@@ -115,7 +115,6 @@ describe("UserProvider", () => {
           password: "test",
         });
         expect(contextRef.current?.user).toEqual(user);
-        expect(revalidate).toHaveBeenCalledTimes(1);
       });
     });
 

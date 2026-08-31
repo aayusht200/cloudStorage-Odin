@@ -20,6 +20,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { UserContext } from "../context/User";
 import { loginSchema, type LoginPayload } from "../schema/auth";
+import { authenticate } from "../service/authenticate";
 export function Login() {
   const { loginUser } = useContext(UserContext);
   const [error, setError] = useState<boolean>(false);
@@ -37,7 +38,8 @@ export function Login() {
 
     try {
       await loginUser(data);
-      navigate("/", { replace: true });
+      const user = await authenticate();
+      navigate(`/drive/${user.rootFolderId}`, { replace: true });
     } catch {
       setError(true);
     }

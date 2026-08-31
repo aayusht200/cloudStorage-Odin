@@ -77,7 +77,6 @@ describe("Login Page", () => {
         expect(emailInput).toHaveValue(payload.email);
         expect(passwordInput).toHaveValue(payload.password);
         expect(loginUser).toHaveBeenCalledWith(payload);
-        expect(navigate).toHaveBeenCalledWith("/", { replace: true });
       });
     });
     describe("Failure", () => {

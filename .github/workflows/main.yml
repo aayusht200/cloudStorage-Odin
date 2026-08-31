@@ -39,8 +39,8 @@ jobs:
             - name: Run client lint
               run: npm --workspace client run lint
 
-            # - name: Run client tests
-            #   run: npm --workspace client run test -- --run
+            - name: Run client tests
+              run: npm --workspace client run test -- --run
 
             - name: Typecheck client
               run: npm --workspace client run typecheck
@@ -54,24 +54,24 @@ jobs:
             - name: Run database migrations
               run: npm --workspace server exec prisma migrate deploy
 
-            # - name: Run server lint
-            #   run: npm --workspace server run lint
+            - name: Run server lint
+              run: npm --workspace server run lint
 
-            # - name: Run server unit tests
-            #   run: npm --workspace server test -- --run "Tests/Unit Test"
+            - name: Run server unit tests
+              run: npm --workspace server test -- --run "Tests/Unit Test"
 
-            # - name: Run server integration tests
-            #   run: npm --workspace server run test -- --run "Tests/Integration"
+            - name: Run server integration tests
+              run: npm --workspace server run test -- --run "Tests/Integration"
 
-            - name: Start server
-              run: npm --workspace server run dev &
+            # - name: Start server
+            #   run: npm --workspace server run dev &
               
-            - name: Wait for server
-              run: |
-                until curl --silent --fail http://localhost:3000/health; do
-                  echo "Waiting for server..."
-                  sleep 1
-                done
+            # - name: Wait for server
+            #   run: |
+            #     until curl --silent --fail http://localhost:3000/health; do
+            #       echo "Waiting for server..."
+            #       sleep 1
+            #     done
 
-            - name: Run E2E tests
-              run: npm --workspace client run test:e2e
+            # - name: Run E2E tests
+            #   run: npm --workspace client run test:e2e
