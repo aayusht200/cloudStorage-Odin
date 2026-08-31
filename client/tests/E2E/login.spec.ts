@@ -16,6 +16,6 @@ test("should navigate to homepage on succesfull login", async ({ page }) => {
   await page.getByRole("button", { name: "Login" }).click();
   console.log("URL:", page.url());
 
-  await expect(page).toHaveURL(/\/drive\/[^/]+$/);
+  await expect(page).toHaveURL("http://localhost:5173/");
 
 });
