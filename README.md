@@ -9,6 +9,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pg%208.22.0-4169E1?style=flat-square&logo=postgresql&logoColor=fff)
 ![Passport.js](https://img.shields.io/badge/Passport.js-0.7.0-34E27A?style=flat-square&logo=passport&logoColor=000)
 ![AWS S3 Compatible Storage](https://img.shields.io/badge/S3%20Compatible%20Storage-AWS%20SDK%203.1095.0-FF9900?style=flat-square&logo=amazons3&logoColor=fff)
+[![Main CI](https://github.com/aayusht200/cloudStorage-Odin/actions/workflows/main.yml/badge.svg)](https://github.com/aayusht200/cloudStorage-Odin/actions/workflows/main.yml)
 
 Cloud Storage Odin is a full-stack cloud storage app for managing personal files and folders in a browser. It supports account-based access, nested folders, file uploads, inline previews for supported media, and signed links for stored files.
 
