@@ -16,7 +16,7 @@ const createFile = async (req, res, next) => {
             });
         }
         const { key: storageName } = await uploadFile(req.file);
-        const result = await prisma.file.create({
+        await prisma.file.create({
             data: {
                 storageName,
                 mimeType: req.file.mimetype,
@@ -75,7 +75,7 @@ const deleteFileByID = async (req, res, next) => {
     try {
         const fileInfo = await prisma.file.findFirst({ where: { id, userId: req.user.id } });
         if (!fileInfo) return res.status(404).json({ message: 'No file with id found.' });
-        const test = await deleteFile(fileInfo.storageName);
+        await deleteFile(fileInfo.storageName);
         const deleteSuccess = await prisma.file.deleteMany({ where: { id, userId: req.user.id } });
         if (deleteSuccess.count === 0) return res.status(404).json({ message: 'File with id not found.' });
         return res.status(200).json({ message: 'File deleted sucessfully', id });

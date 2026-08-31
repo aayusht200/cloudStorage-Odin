@@ -13,12 +13,6 @@ const pgStore = new connectPgSimple(session);
 const app = express();
 const allowedRegex = /^https:\/\/cloud-storage-odin.*\.vercel\.app$/;
 
-const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:4173',
-    'https://cloud-storage-odin-client-rose.vercel.app/',
-];
-
 app.use(
     cors({
         origin(origin, callback) {
@@ -62,7 +56,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/folders', folderRoutes);
 
-app.use((err, _req, res, _next) => {
+app.use((err, _req, res) => {
     res.status(err.status || 500).json({
         message: err.message || 'Internal Server Error',
     });

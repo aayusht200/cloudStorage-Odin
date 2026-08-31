@@ -17,7 +17,9 @@ passport.use(
                     message: 'Invalid credentials',
                 });
             }
-            const { password: _, ...safeUser } = result;
+            const safeUser = { ...result };
+            delete safeUser.password;
+
             return done(null, safeUser);
         } catch (error) {
             return done(error);
@@ -36,7 +38,9 @@ passport.deserializeUser(async (id, done) => {
             return done(null, false);
         }
 
-        const { password: _, ...safeUser } = result;
+        const safeUser = { ...result };
+        delete safeUser.password;
+
         return done(null, safeUser);
     } catch (error) {
         return done(error);

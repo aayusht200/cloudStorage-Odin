@@ -10,18 +10,15 @@ const uploadFile = async (file) => {
         ContentType: file.mimetype,
     };
     const command = new PutObjectCommand(params);
-    try {
-        const uploadData = await client.send(command);
-        if (uploadData.$metadata.httpStatusCode !== 200) {
-            throw new Error('File upload failed');
-        }
 
-        return {
-            key: params.Key,
-        };
-    } catch (error) {
-        throw error;
+    const uploadData = await client.send(command);
+    if (uploadData.$metadata.httpStatusCode !== 200) {
+        throw new Error('File upload failed');
     }
+
+    return {
+        key: params.Key,
+    };
 };
 
 const getSignedUrlByKey = async (key) => {
@@ -30,12 +27,9 @@ const getSignedUrlByKey = async (key) => {
         Key: key,
     };
     const getInfo = new GetObjectCommand(input);
-    try {
-        const url = await getSignedUrl(client, getInfo, { expiresIn: 3600 });
-        return url;
-    } catch (error) {
-        throw error;
-    }
+
+    const url = await getSignedUrl(client, getInfo, { expiresIn: 3600 });
+    return url;
 };
 
 const deleteFile = async (key) => {
@@ -44,15 +38,12 @@ const deleteFile = async (key) => {
         Key: key,
     };
     const command = new DeleteObjectCommand(input);
-    try {
-        const result = await client.send(command);
-        if (result.$metadata.httpStatusCode !== 204) {
-            throw new Error('File delete failed');
-        }
-        return { key };
-    } catch (error) {
-        throw error;
+
+    const result = await client.send(command);
+    if (result.$metadata.httpStatusCode !== 204) {
+        throw new Error('File delete failed');
     }
+    return { key };
 };
 
 export { deleteFile, getSignedUrlByKey, uploadFile };

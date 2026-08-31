@@ -153,7 +153,7 @@ describe('folderController', () => {
             describe('when generating the folder path fails', () => {
                 it('should pass the error to next', async () => {
                     // Arrange
-                    const id = crypto.randomUUID();
+
                     const error = new Error('Path generation failed');
                     prisma.folder.findFirst.mockResolvedValue({ id: result.id });
                     generatePath.mockRejectedValue(error);

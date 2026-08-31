@@ -390,7 +390,7 @@ describe('loginUser', () => {
     describe('success', () => {
         beforeEach(() => {
             passport.authenticate.mockImplementation((strategy, callback) => {
-                return (req, res, next) =>
+                return () =>
                     callback(
                         null,
                         {
@@ -428,7 +428,7 @@ describe('loginUser', () => {
             //Arrange
             const error = new Error();
             passport.authenticate.mockImplementation((strategy, callback) => {
-                return (req, res, next) => callback(error, null, null);
+                return () => callback(error, null, null);
             });
             //Assert
             loginUser(req, res, next);
@@ -444,7 +444,7 @@ describe('loginUser', () => {
             //Arrange
             const info = { message: 'authentication failed' };
             passport.authenticate.mockImplementation((_, callback) => {
-                return (req, res, next) => callback(null, false, info);
+                return () => callback(null, false, info);
             });
             //Assert
             loginUser(req, res, next);
@@ -461,7 +461,7 @@ describe('loginUser', () => {
             //Arrange
             const error = new Error({ message: 'Login failed' });
             passport.authenticate.mockImplementation((_, callback) => {
-                return (req, res, next) => callback(null, { id: 'user-id', email: 'test@test.com' }, null);
+                return () => callback(null, { id: 'user-id', email: 'test@test.com' }, null);
             });
             req.login.mockImplementation((_, callback) => {
                 callback(error);
@@ -482,7 +482,7 @@ describe('loginUser', () => {
             //Arrange
             const error = new Error('Login failed');
             passport.authenticate.mockImplementation((_, callback) => {
-                return (req, res, next) => callback(null, { id: 'user-id', email: 'test@test.com' }, null);
+                return () => callback(null, { id: 'user-id', email: 'test@test.com' }, null);
             });
             req.login.mockImplementation((user, callback) => {
                 callback(null);

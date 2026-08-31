@@ -52,7 +52,9 @@ describe('User routes', () => {
                 const existingUser = await createTestUser();
                 createdEmails.push(existingUser.email);
                 // Act
-                const response = await request(app).post('/api/users/signup').send({ ...payload, email: existingUser.email });
+                const response = await request(app)
+                    .post('/api/users/signup')
+                    .send({ ...payload, email: existingUser.email });
                 // Assert
                 expect(response.status).toBe(409);
                 expect(response.body).toEqual({ message: 'User already exists' });
@@ -71,7 +73,7 @@ describe('User routes', () => {
                 // Act
                 await createTestUser(payload);
                 createdEmails.push(payload.email);
-                const loginResponse = await agent.post('/api/users/login').send(payload);
+                await agent.post('/api/users/login').send(payload);
                 const response = await agent.get('/api/users/me');
                 // Assert
                 expect(response.status).toBe(200);
@@ -93,7 +95,7 @@ describe('User routes', () => {
                 // Arrange
                 await createTestUser(payload);
                 createdEmails.push(payload.email);
-                const loginResponse = await agent.post('/api/users/login').send({ ...payload, password: 'Test@1234' });
+
                 const response = await agent.get('/api/users/me');
                 // Assert
                 expect(response.status).toBe(401);
