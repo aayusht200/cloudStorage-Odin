@@ -55,7 +55,9 @@ app.use(passport.session());
 app.use('/api/users', userRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/folders', folderRoutes);
-
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+});
 app.use((err, _req, res) => {
     res.status(err.status || 500).json({
         message: err.message || 'Internal Server Error',

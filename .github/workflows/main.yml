@@ -31,7 +31,7 @@ jobs:
 
             - name: Install dependencies
               run: npm ci
-              
+
             - name: Install Playwright browsers
               run: npm --workspace client exec playwright install --with-deps chromium
 
@@ -65,5 +65,12 @@ jobs:
             - name: Start server
               run: npm --workspace server run dev &
               
+            - name: Wait for server
+              run: |
+                until curl --silent --fail http://localhost:3000/health; do
+                  echo "Waiting for server..."
+                  sleep 1
+                done
+
             - name: Run E2E tests
               run: npm --workspace client run test:e2e
