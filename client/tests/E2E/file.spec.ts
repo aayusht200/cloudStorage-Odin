@@ -16,6 +16,11 @@ test.describe("files", () => {
       .getByRole("textbox", { name: "Password" })
       .fill(payload.password);
     await page.getByRole("button", { name: "Login" }).click();
+    page.on("response", (response) => {
+      if (response.url().includes("/api/")) {
+        console.log("API:", response.status(), response.url());
+      }
+    });
     await expect(page).toHaveURL(/\/drive\/[^/]+$/);
   });
   test.describe("File uploads", () => {
