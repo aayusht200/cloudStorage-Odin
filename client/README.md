@@ -1,5 +1,7 @@
 # Cloud Storage Odin Client
 
+[![Main CI](https://github.com/aayusht200/cloudStorage-Odin/actions/workflows/main.yml/badge.svg)](https://github.com/aayusht200/cloudStorage-Odin/actions/workflows/main.yml)
+
 The client is a Vite React app for the Cloud Storage Odin drive UI. It handles authentication screens, protected drive routes, folder navigation, file upload forms, file previews, and theme switching.
 
 ## Tech Stack
@@ -97,6 +99,8 @@ Latest verified Playwright result:
 
 Playwright covers the home page, signup, login, logout, theme switching and persistence, system light/dark behavior, folder creation, folder navigation, folder deletion, file upload, file details, share-link copying, and file deletion. The E2E suite requires the frontend dev server, backend API, database, S3-compatible storage, and the existing upload fixture used by the tests.
 
+GitHub Actions runs the client lint, Vitest tests, typecheck, production build, and Playwright E2E suite as part of the repository `Main CI` workflow.
+
 ### Testing Roadmap
 
 Completed:
@@ -105,10 +109,10 @@ Completed:
 - Backend integration tests
 - Frontend tests for pages, UserProvider behavior, schemas, helpers, services, and loaders
 - Playwright E2E tests for core browser workflows
+- GitHub Actions CI for linting, tests, typecheck, build, and E2E checks
 
 Next:
 
-- CI/CD
 - Maintain coverage as new frontend features are added
 
 ## Deployment

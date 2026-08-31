@@ -313,6 +313,8 @@ cd client
 npm run test:e2e
 ```
 
+GitHub Actions runs the full project check on push, pull request, and manual dispatch: client lint, Vitest tests, typecheck, build, Prisma client generation, database migrations, server lint, server unit and integration tests, and Playwright E2E tests.
+
 ## Deployment
 
 | Layer | Production Service |
@@ -338,7 +340,7 @@ Incoming API payloads are validated with Zod middleware before reaching controll
 
 ## Current Project Status
 
-The project has a working full-stack implementation with session authentication, nested folders, file upload and deletion, signed file URLs, Zod validation, Prisma migrations, a backend unit/integration test suite, and frontend tests for pages, context, schemas, helpers, services, and loaders.
+The project has a working full-stack implementation with session authentication, nested folders, file upload and deletion, signed file URLs, Zod validation, Prisma migrations, backend unit/integration tests, frontend unit/component tests, Playwright E2E tests, and GitHub Actions CI.
 
 ## Future Improvements
 
@@ -347,7 +349,6 @@ The project has a working full-stack implementation with session authentication,
 - File and folder rename support
 - Search across files and folders
 - Dedicated download action for all file types
-- CI/CD
 - Maintain and expand tests as new UI and API features are added
 - Improved empty states and loading states
 

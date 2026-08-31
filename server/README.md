@@ -1,5 +1,7 @@
 # Cloud Storage Odin Server
 
+[![Main CI](https://github.com/aayusht200/cloudStorage-Odin/actions/workflows/main.yml/badge.svg)](https://github.com/aayusht200/cloudStorage-Odin/actions/workflows/main.yml)
+
 The server is an Express API for authentication, folders, file metadata, session persistence, Zod request validation, and S3-compatible file storage. It uses Prisma with PostgreSQL and stores sessions in PostgreSQL through `connect-pg-simple`.
 
 ## Tech Stack
@@ -184,6 +186,8 @@ Latest verified backend result:
 | Branches | 84.93% |
 | Functions | 96.66% |
 | Lines | 94.83% |
+
+GitHub Actions runs Prisma client generation, database migrations, server lint, unit tests, and integration tests as part of the repository `Main CI` workflow.
 
 ## Production
 
