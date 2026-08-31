@@ -14,7 +14,8 @@ test("should navigate to homepage on succesfull login", async ({ page }) => {
   await page.getByRole("textbox", { name: "Email" }).fill(payload.email);
   await page.getByRole("textbox", { name: "Password" }).fill(payload.password);
   await page.getByRole("button", { name: "Login" }).click();
+  console.log("URL:", page.url());
+
   await expect(page).toHaveURL(/\/drive\/[^/]+$/);
 
-  console.log("URL:", page.url());
 });
