@@ -39,6 +39,7 @@ const getUserById = async (req, res, next) => {
             lastName: user.lastName,
             role: user.role,
             rootFolderId: rootFolder.id,
+            csrfToken: req.session.csrfToken,
         });
     } catch (error) {
         next(error);
@@ -53,13 +54,14 @@ const loginUser = (req, res, next) => {
         }
         req.login(user, (err) => {
             if (err) return next(err);
-
+            req.session.csrfToken = crypto.randomUUID();
             req.session.save((err) => {
                 if (err) return next(err);
 
                 return res.status(200).json({
                     message: 'Logged in',
                     user,
+                    csrfToken: req.session.csrfToken,
                 });
             });
         });

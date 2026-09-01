@@ -40,12 +40,12 @@ const createAuthenticatedAgent = async (overrides = {}) => {
     if (userResponse.status !== 200) {
         throw new Error(`Unable to load test user ${payload.email}: ${userResponse.status}`);
     }
-
     return {
         agent,
         payload,
         user: userResponse.body,
         rootFolderId: userResponse.body.rootFolderId,
+        csrfToken: userResponse.body.csrfToken,
     };
 };
 

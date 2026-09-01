@@ -7,7 +7,7 @@ describe('Folder routes', () => {
     let agent;
     let payload;
     let createdEmails;
-
+    let csrfToken;
     beforeEach(() => {
         agent = request.agent(app);
         createdEmails = [];
@@ -27,6 +27,7 @@ describe('Folder routes', () => {
         agent = auth.agent;
         payload.parentId = auth.rootFolderId;
         createdEmails.push(auth.payload.email);
+        csrfToken = auth.csrfToken;
     };
 
     describe('POST /api/folders/create', () => {
@@ -36,7 +37,10 @@ describe('Folder routes', () => {
                 // Login using agent
                 await authenticate();
                 // Act
-                const createResponse = await agent.post('/api/folders/create').send(payload);
+                const createResponse = await agent
+                    .post('/api/folders/create')
+                    .set('x-csrf-token', csrfToken)
+                    .send(payload);
                 // Assert
                 expect(createResponse.status).toBe(201);
                 expect(createResponse.body).toEqual({ message: 'Folder created successfully', id: expect.any(String) });
@@ -46,7 +50,10 @@ describe('Folder routes', () => {
         describe('failure', () => {
             it('should reject an unauthenticated request', async () => {
                 // Act
-                const createResponse = await agent.post('/api/folders/create').send(payload);
+                const createResponse = await agent
+                    .post('/api/folders/create')
+                    .set('x-csrf-token', csrfToken)
+                    .send(payload);
                 // Assert
                 expect(createResponse.status).toBe(401);
                 expect(createResponse.body).toEqual({
@@ -60,6 +67,7 @@ describe('Folder routes', () => {
                 // Act
                 const createResponse = await agent
                     .post('/api/folders/create')
+                    .set('x-csrf-token', csrfToken)
                     .send({ ...payload, parentId: undefined });
                 // Assert
                 expect(createResponse.status).toBe(400);
@@ -70,8 +78,11 @@ describe('Folder routes', () => {
                 // Login using agent
                 await authenticate();
                 // Act
-                await agent.post('/api/folders/create').send(payload);
-                const secondCreateReq = await agent.post('/api/folders/create').send(payload);
+                await agent.post('/api/folders/create').set('x-csrf-token', csrfToken).send(payload);
+                const secondCreateReq = await agent
+                    .post('/api/folders/create')
+                    .set('x-csrf-token', csrfToken)
+                    .send(payload);
                 // Assert
                 expect(secondCreateReq.status).toBe(409);
                 expect(secondCreateReq.body).toEqual({ message: 'Folder with same name exists' });
@@ -86,7 +97,10 @@ describe('Folder routes', () => {
                 // Login using agent
                 await authenticate();
                 // Act
-                const createResponse = await agent.post('/api/folders/create').send(payload);
+                const createResponse = await agent
+                    .post('/api/folders/create')
+                    .set('x-csrf-token', csrfToken)
+                    .send(payload);
                 // Assert
                 const infoResponse = await agent.get(`/api/folders/${createResponse.body.id}`);
                 expect(infoResponse.status).toBe(200);
@@ -145,9 +159,14 @@ describe('Folder routes', () => {
             it('should delete the folder', async () => {
                 // Arrange
                 await authenticate();
-                const createResponse = await agent.post('/api/folders/create').send(payload);
+                const createResponse = await agent
+                    .post('/api/folders/create')
+                    .set('x-csrf-token', csrfToken)
+                    .send(payload);
                 // Act
-                const deleteResponse = await agent.delete(`/api/folders/${createResponse.body.id}`);
+                const deleteResponse = await agent
+                    .delete(`/api/folders/${createResponse.body.id}`)
+                    .set('x-csrf-token', csrfToken);
                 // Assert
                 expect(deleteResponse.status).toBe(200);
                 expect(deleteResponse.body).toEqual({ message: 'Folder delete successfully' });
@@ -170,7 +189,7 @@ describe('Folder routes', () => {
                 // Login using agent
                 await authenticate();
                 // Act
-                const deleteResponse = await agent.delete(`/api/folders/undefined`);
+                const deleteResponse = await agent.delete(`/api/folders/undefined`).set('x-csrf-token', csrfToken);
                 // Assert
                 expect(deleteResponse.status).toBe(400);
                 expect(deleteResponse.body.errors.fieldErrors).toEqual({
@@ -183,7 +202,9 @@ describe('Folder routes', () => {
                 // Login using agent
                 await authenticate();
                 // Act
-                const deleteResponse = await agent.delete(`/api/folders/${crypto.randomUUID()}`);
+                const deleteResponse = await agent
+                    .delete(`/api/folders/${crypto.randomUUID()}`)
+                    .set('x-csrf-token', csrfToken);
                 // Assert
                 expect(deleteResponse.status).toBe(404);
                 expect(deleteResponse.body).toEqual({ message: 'Folder with id not found' });

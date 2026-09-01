@@ -16,7 +16,7 @@ describe('File routes', () => {
     let filePath;
     let fileId;
     let createdEmails;
-
+    let csrfToken;
     beforeEach(() => {
         agent = request.agent(app);
         folderId = crypto.randomUUID();
@@ -31,14 +31,14 @@ describe('File routes', () => {
 
     const authenticate = async () => {
         const auth = await createAuthenticatedAgent();
-
         agent = auth.agent;
         folderId = auth.rootFolderId;
         createdEmails.push(auth.payload.email);
+        csrfToken = auth.csrfToken;
     };
 
     const uploadTestFile = async () => {
-        return agent.post('/api/files/create').field('folderId', folderId).attach('file', filePath);
+        return agent.post('/api/files/create').set('x-csrf-token',csrfToken).field('folderId', folderId).attach('file', filePath);
     };
 
     describe('POST /api/files/create', () => {
@@ -75,7 +75,10 @@ describe('File routes', () => {
                 await authenticate();
 
                 // Act
-                const createResponse = await agent.post('/api/files/create').field('folderId', folderId);
+                const createResponse = await agent
+                    .post('/api/files/create')
+                    .set('x-csrf-token', csrfToken)
+                    .field('folderId', folderId);
 
                 // Assert
                 expect(createResponse.status).toBe(400);
@@ -89,6 +92,7 @@ describe('File routes', () => {
                 // Act
                 const createResponse = await agent
                     .post('/api/files/create')
+                    .set('x-csrf-token', csrfToken)
                     .field('folderId', folderId)
                     .attach('file', path.join(__dirname, 'test.txt'));
 
@@ -106,6 +110,7 @@ describe('File routes', () => {
                 // Act
                 const createResponse = await agent
                     .post('/api/files/create')
+                    .set('x-csrf-token', csrfToken)
                     .field('folderId', crypto.randomUUID())
                     .attach('file', filePath);
 
@@ -197,7 +202,9 @@ describe('File routes', () => {
                 const infoResponse = await agent.get(`/api/folders/${folderId}`);
 
                 // Act
-                const response = await agent.delete(`/api/files/${infoResponse.body.files[0].id}`);
+                const response = await agent
+                    .delete(`/api/files/${infoResponse.body.files[0].id}`)
+                    .set('x-csrf-token', csrfToken);
 
                 // Assert
                 expect(response.status).toBe(200);
@@ -218,7 +225,7 @@ describe('File routes', () => {
         describe('failure', () => {
             it('should reject an unauthenticated request', async () => {
                 // Act
-                const response = await agent.delete(`/api/files/${fileId}`);
+                const response = await agent.delete(`/api/files/${fileId}`).set('x-csrf-token', csrfToken);
 
                 // Assert
                 expect(response.status).toBe(401);
@@ -232,7 +239,7 @@ describe('File routes', () => {
                 await authenticate();
 
                 // Act
-                const response = await agent.delete('/api/files/undefined');
+                const response = await agent.delete('/api/files/undefined').set('x-csrf-token', csrfToken);
 
                 // Assert
                 expect(response.status).toBe(400);
@@ -246,7 +253,7 @@ describe('File routes', () => {
                 await authenticate();
 
                 // Act
-                const response = await agent.delete(`/api/files/${crypto.randomUUID()}`);
+                const response = await agent.delete(`/api/files/${crypto.randomUUID()}`).set('x-csrf-token', csrfToken);
 
                 // Assert
                 expect(response.status).toBe(404);

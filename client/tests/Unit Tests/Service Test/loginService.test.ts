@@ -5,6 +5,7 @@ vi.mock("../../../src/service/api", () => ({
   api: {
     post: vi.fn(),
   },
+  setCsrfToken: vi.fn(),
 }));
 
 describe("login", () => {

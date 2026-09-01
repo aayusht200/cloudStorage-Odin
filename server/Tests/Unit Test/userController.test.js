@@ -228,7 +228,9 @@ describe('getUserById', () => {
                 role: 'user',
             };
             const rootFolder = { id: 'folder-id' };
-
+            req.session = {
+                csrfToken: 'test-csrf-token',
+            };
             // - prisma.user.findUnique -> existing user
             prisma.user.findUnique.mockResolvedValue(user);
 
@@ -253,6 +255,7 @@ describe('getUserById', () => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: user.role,
+                csrfToken: req.session.csrfToken,
                 rootFolderId: rootFolder.id,
             });
             expect(next).not.toHaveBeenCalled();

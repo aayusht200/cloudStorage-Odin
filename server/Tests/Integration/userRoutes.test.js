@@ -172,7 +172,9 @@ describe('User routes', () => {
                 createdEmails.push(payload.email);
                 await agent.post('/api/users/login').send(payload);
                 const response = await agent.get('/api/users/me');
-                const logoutResponse = await agent.post('/api/users/logout');
+                const logoutResponse = await agent
+                    .post('/api/users/logout')
+                    .set('x-csrf-token', response.body.csrfToken);
                 const afterLogout = await agent.get('/api/users/me');
                 // Login using agent
                 // Assert

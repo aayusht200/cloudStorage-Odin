@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { api } from "../../../src/service/api";
 import { authenticate } from "../../../src/service/authenticate.ts";
+
 vi.mock("../../../src/service/api", () => ({
   api: {
     get: vi.fn(),
   },
+  setCsrfToken: vi.fn(),
 }));
 
 describe("authenticate", () => {
