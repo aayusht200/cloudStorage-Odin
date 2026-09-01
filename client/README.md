@@ -9,7 +9,7 @@ The client is a Vite React app for the Cloud Storage Odin drive UI. It handles a
 - React 19, TypeScript, and React Router
 - Vite with the React Compiler preset
 - Tailwind CSS 4
-- Axios with credentialed requests
+- Axios with credentialed requests and CSRF token headers for mutations
 - Base UI, shadcn-style primitives, Lucide, and Tabler icons
 - Vitest, Testing Library, jsdom, Playwright, and V8 coverage
 
@@ -44,6 +44,7 @@ Vite prints the local URL when it starts. The usual development URL is `http://l
 | `npm run dev` | Start the Vite development server |
 | `npm run build` | Type-check and create a production build |
 | `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run the TypeScript project check |
 | `npm run preview` | Preview the production build locally |
 | `npm test` | Run frontend Vitest tests |
 | `npm test -- --coverage --run` | Run frontend tests with V8 coverage |
@@ -77,6 +78,7 @@ Frontend tests are organized under `client/tests`. Vitest `.test.*` files cover 
 | React Router loaders | `authRedirectLoader`, `driveLoader`, `filesLoader`, `rootLoader` |
 
 The Vitest tests use Testing Library, jsdom, V8 coverage, Axios/service mocking, and React Router dependency mocking.
+Service tests include the shared Axios client behavior that stores CSRF tokens from auth responses and sends `x-csrf-token` on state-changing requests.
 
 Latest verified Vitest result:
 
@@ -84,12 +86,12 @@ Latest verified Vitest result:
 | --- | --- |
 | Test files | 27 passed |
 | Tests | 100 passed |
-| Statements | 85.71% |
-| Branches | 85.81% |
-| Functions | 76.10% |
-| Lines | 85.92% |
+| Statements | 85.05% |
+| Branches | 83.67% |
+| Functions | 75.65% |
+| Lines | 85.25% |
 
-Pages, loaders, schemas, services, and helpers report 100% coverage in the latest coverage run. Overall frontend coverage is lower because UI infrastructure, third-party-derived UI primitives, and some context/provider branches remain partially uncovered.
+Loaders, schemas, and helpers report 100% coverage in the latest coverage run. Pages are effectively covered at 98.93% statements, and service coverage is 95.34% statements after the CSRF token handling update. Overall frontend coverage is lower because UI infrastructure, third-party-derived UI primitives, and some context/provider branches remain partially uncovered.
 
 Latest verified Playwright result:
 
@@ -117,4 +119,4 @@ Next:
 
 ## Deployment
 
-The project includes `vercel.json` with a rewrite to `index.html` so browser refreshes work on client-side routes. Set `VITE_API_URL` in the deployment environment to the production API URL.
+The client is deployed on Vercel. The project includes `vercel.json` with a rewrite to `index.html` so browser refreshes work on client-side routes and an `/api/:path*` rewrite to the Render backend. Set `VITE_API_URL` in the deployment environment to the production API URL.

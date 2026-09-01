@@ -12,6 +12,7 @@ The server is an Express API for authentication, folders, file metadata, session
 | Authentication | Passport local strategy, Express Session, bcrypt |
 | Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
 | Validation | Zod |
+| Security | Credentialed CORS, CSRF middleware |
 | Uploads and storage | Multer, AWS SDK S3 client, S3-compatible object storage |
 | Testing | Vitest, Supertest, V8 coverage |
 
@@ -22,7 +23,7 @@ server/
 ├── Tests/        # Vitest unit tests and Supertest integration tests
 ├── config/       # Prisma, pg pool, Passport, Multer, and S3 client configuration
 ├── controller/   # User, folder, and file request handlers
-├── middleware/   # Auth guards and reusable Zod validation middleware
+├── middleware/   # Auth guards, CSRF verification, and reusable Zod validation middleware
 ├── prisma/       # Prisma schema and migrations
 ├── routes/       # Express route definitions
 ├── schema/       # Zod schemas for auth, folders, files, and route ids
@@ -85,39 +86,44 @@ The app allows credentialed CORS requests from `http://localhost:5173`, `http://
 | `npm run dev` | Start the API with Nodemon |
 | `npm start` | Start the API with Node |
 | `npm run generate` | Generate the Prisma client |
+| `npm run lint` | Run ESLint |
 | `npm test` | Run backend Vitest tests |
 | `npm run coverage` | Run Vitest with V8 coverage |
 
 ## API Routes
 
-All drive routes require an authenticated session. Auth requests are validated before controller logic runs.
+All drive routes require an authenticated session. Auth requests are validated before controller logic runs. Authenticated state-changing routes also require the session CSRF token in the `x-csrf-token` header.
 
 | Method | Path | Middleware | Purpose |
 | --- | --- | --- | --- |
 | `POST` | `/api/users/signup` | `validate(signupSchema)` | Create an account and root folder |
-| `POST` | `/api/users/login` | `validate(loginSchema)` | Login with Passport |
-| `POST` | `/api/users/logout` | `requireAuth` | Logout and clear the session cookie |
-| `GET` | `/api/users/me` | `requireAuth` | Return the current user and root folder id |
-| `POST` | `/api/folders/create` | `requireAuth`, `validate(createFolderSchema)` | Create a folder |
+| `POST` | `/api/users/login` | `validate(loginSchema)` | Login with Passport and return a CSRF token |
+| `POST` | `/api/users/logout` | `requireAuth`, `csrfVerification` | Logout and clear the session cookie |
+| `GET` | `/api/users/me` | `requireAuth` | Return the current user, root folder id, and CSRF token |
+| `POST` | `/api/folders/create` | `requireAuth`, `csrfVerification`, `validate(createFolderSchema)` | Create a folder |
 | `GET` | `/api/folders/:id` | `requireAuth`, `validate(idSchema, "params")` | Get a folder, children, files, and path |
-| `DELETE` | `/api/folders/:id` | `requireAuth`, `validate(idSchema, "params")` | Delete a folder |
-| `POST` | `/api/files/create` | `requireAuth`, `upload.single("file")`, `validate(createFileSchema, "file")` | Upload a file |
+| `DELETE` | `/api/folders/:id` | `requireAuth`, `csrfVerification`, `validate(idSchema, "params")` | Delete a folder |
+| `POST` | `/api/files/create` | `requireAuth`, `csrfVerification`, `upload.single("file")`, `validate(createFileSchema, "file")` | Upload a file |
 | `GET` | `/api/files/:id` | `requireAuth`, `validate(idSchema, "params")` | Get file metadata, path, and a signed URL |
-| `DELETE` | `/api/files/:id` | `requireAuth`, `validate(idSchema, "params")` | Delete a file |
+| `DELETE` | `/api/files/:id` | `requireAuth`, `csrfVerification`, `validate(idSchema, "params")` | Delete a file |
 
 ## Architecture
 
 ### Request Flow
 
-Requests enter `app.js`, pass through CORS, JSON/form parsing, session handling, and Passport initialization. Mounted routers apply route-specific authentication, Multer upload parsing, and Zod validation before calling controllers. Controllers use Prisma and service helpers, then send JSON responses or pass unexpected errors to `next(error)`.
+Requests enter `app.js`, pass through CORS, JSON/form parsing, session handling, and Passport initialization. Mounted routers apply route-specific authentication, CSRF verification for state-changing authenticated requests, Multer upload parsing, and Zod validation before calling controllers. Controllers use Prisma and service helpers, then send JSON responses or pass unexpected errors to `next(error)`.
 
 ### Authentication Flow
 
-Signup validates the body, checks for an existing email, hashes the password with bcrypt, and creates the user plus a `root` folder inside a Prisma transaction. Login uses Passport's local strategy with `email` as the username field, compares bcrypt hashes, removes the password from the session user, and stores the user id in the session. Logout calls `req.logout`, destroys the session, and clears `connect.sid`.
+Signup validates the body, checks for an existing email, hashes the password with bcrypt, and creates the user plus a `root` folder inside a Prisma transaction. Login uses Passport's local strategy with `email` as the username field, compares bcrypt hashes, removes the password from the session user, stores the user id and CSRF token in the session, and saves the session before responding. `/api/users/me` returns the current user, root folder id, and session CSRF token. Logout verifies the CSRF token, calls `req.logout`, destroys the session, and clears `connect.sid`.
+
+### CSRF Flow
+
+Login creates a random session CSRF token and returns it to the client. `/api/users/me` also returns the current session token so an already-authenticated browser can refresh client state. The frontend sends that value as `x-csrf-token` on `POST`, `PUT`, `PATCH`, and `DELETE` requests through the shared Axios client. The `csrfVerification` middleware rejects mismatched or missing tokens with `403`.
 
 ### Validation Flow
 
-The reusable `validate(schema, target = "body")` middleware calls `schema.safeParse(req[target])`. Valid data replaces the original request target and continues to the controller. Invalid data returns `400` with flattened Zod errors. Routes currently validate auth bodies, folder bodies, route params, and uploaded file objects.
+The reusable `validate(schema, target = "body")` middleware calls `schema.safeParse(req[target])`. Valid data replaces the original request target and continues to the controller. Invalid data returns `400` with flattened Zod errors. Routes currently validate auth bodies, folder bodies, route params, and uploaded file objects. CSRF validation is separate from Zod validation and runs before controllers on authenticated mutation routes.
 
 ### Error Handling Flow
 
@@ -160,6 +166,7 @@ Vitest runs in a Node environment. Tests live in `server/Tests`, with unit tests
 | Test file | Coverage |
 | --- | --- |
 | `authSchema.test.js` | Login and signup schema validation, email rules, password complexity, trimming, and name validation |
+| `csrfMiddleware.test.js` | Valid, invalid, and missing CSRF token handling |
 | `folderSchema.test.js` | Folder name validation and parent UUID validation |
 | `fileSchema.test.js` | File object validation, MIME types, size boundaries, Buffer validation, and id UUID validation |
 | `validateMiddleware.test.js` | Body, params, and file validation success and failure paths |
@@ -170,7 +177,7 @@ Vitest runs in a Node environment. Tests live in `server/Tests`, with unit tests
 | `folderRoute.test.js` | Authenticated folder create/read/delete flows, validation failures, duplicates, and missing folders |
 | `fileRoute.test.js` | Authenticated file upload/read/delete flows, validation failures, file type handling, and missing files |
 
-Controller tests mock Prisma, bcrypt, Passport, request login/logout/session methods, response helpers, and storage helpers with `vi.mock` and `vi.fn`. Middleware tests use mock request, response, and `next` objects. Schema tests call Zod `parse` and `safeParse` directly. Integration tests use Supertest, including `request.agent(app)` where session and cookie persistence is required.
+Controller tests mock Prisma, bcrypt, Passport, request login/logout/session methods, response helpers, and storage helpers with `vi.mock` and `vi.fn`. Middleware tests use mock request, response, and `next` objects for CSRF and Zod validation behavior. Schema tests call Zod `parse` and `safeParse` directly. Integration tests use Supertest, including `request.agent(app)` where session and cookie persistence is required.
 
 Integration tests create their required users, folders, files, and uploaded S3-compatible storage objects where needed. Shared utilities in `server/Tests/Integration/testUtils.js` provide fixture creation, authenticated agent setup, and cleanup so tests do not depend on manually persisted development database records.
 
@@ -180,12 +187,12 @@ Latest verified backend result:
 
 | Metric | Result |
 | --- | --- |
-| Test files | 10 passed |
-| Tests | 140 passed |
-| Statements | 95.08% |
-| Branches | 84.93% |
-| Functions | 96.66% |
-| Lines | 94.83% |
+| Test files | 11 passed |
+| Tests | 143 passed |
+| Statements | 95.13% |
+| Branches | 80% |
+| Functions | 90.62% |
+| Lines | 94.88% |
 
 GitHub Actions runs Prisma client generation, database migrations, server lint, unit tests, and integration tests as part of the repository `Main CI` workflow.
 
@@ -198,3 +205,5 @@ npm start
 ```
 
 Production cookies use `secure: true` and `sameSite: "none"`, so the API must be served over HTTPS when used by the deployed frontend.
+
+The server is deployed on Render with Supabase PostgreSQL and S3-compatible storage configured through environment variables. Deployment is handled by the connected Render service, while GitHub Actions provides CI checks.
