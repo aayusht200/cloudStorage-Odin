@@ -151,6 +151,23 @@ describe('Folder routes', () => {
                 expect(infoResponse.status).toBe(404);
                 expect(infoResponse.body).toEqual({ message: 'Folder with id not found' });
             });
+            it('should return 404 when the user does not own the folder', async () => {
+                //Arrange
+                const authuserA = await createAuthenticatedAgent();
+                const folderIdA = authuserA.rootFolderId;
+                createdEmails.push(authuserA.payload.email);
+                const authuserB = await createAuthenticatedAgent();
+                const agentB = authuserB.agent;
+                createdEmails.push(authuserB.payload.email);
+                //Act
+                const response = await agentB.get(`/api/folders/${folderIdA}`);
+
+                //Assert
+                expect(response.status).toBe(404);
+                expect(response.body).toEqual({
+                    message: 'Folder with id not found',
+                });
+            });
         });
     });
 
@@ -208,6 +225,24 @@ describe('Folder routes', () => {
                 // Assert
                 expect(deleteResponse.status).toBe(404);
                 expect(deleteResponse.body).toEqual({ message: 'Folder with id not found' });
+            });
+            it('should return 404 when the user does not own the folder', async () => {
+                //Arrange
+                const authuserA = await createAuthenticatedAgent();
+                const folderIdA = authuserA.rootFolderId;
+                createdEmails.push(authuserA.payload.email);
+                const authuserB = await createAuthenticatedAgent();
+                const agentB = authuserB.agent;
+                const csrfTokenB = authuserB.csrfToken;
+                createdEmails.push(authuserB.payload.email);
+                //Act
+                const response = await agentB.delete(`/api/folders/${folderIdA}`).set('x-csrf-token', csrfTokenB);
+
+                //Assert
+                expect(response.status).toBe(404);
+                expect(response.body).toEqual({
+                    message: 'Folder with id not found',
+                });
             });
         });
     });
