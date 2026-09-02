@@ -38,7 +38,11 @@ describe('File routes', () => {
     };
 
     const uploadTestFile = async () => {
-        return agent.post('/api/files/create').set('x-csrf-token',csrfToken).field('folderId', folderId).attach('file', filePath);
+        return agent
+            .post('/api/files/create')
+            .set('x-csrf-token', csrfToken)
+            .field('folderId', folderId)
+            .attach('file', filePath);
     };
 
     describe('POST /api/files/create', () => {
@@ -189,6 +193,32 @@ describe('File routes', () => {
                     message: 'No file found with this id',
                 });
             });
+            it('should return 404 when the user does not own the file', async () => {
+                //Arrange
+                const authuserA = await createAuthenticatedAgent();
+                const agentA = authuserA.agent;
+                const folderIdA = authuserA.rootFolderId;
+                createdEmails.push(authuserA.payload.email);
+                const csrfTokenA = authuserA.csrfToken;
+                const authuserB = await createAuthenticatedAgent();
+                const agentB = authuserB.agent;
+                createdEmails.push(authuserB.payload.email);
+                //Act
+                await agentA
+                    .post('/api/files/create')
+                    .set('x-csrf-token', csrfTokenA)
+                    .field('folderId', folderIdA)
+                    .attach('file', filePath);
+
+                const infoResponse = await agentA.get(`/api/folders/${folderIdA}`);
+                const response = await agentB.get(`/api/files/${infoResponse.body.files[0].id}`);
+
+                //Assert
+                expect(response.status).toBe(404);
+                expect(response.body).toEqual({
+                    message: 'No file found with this id',
+                });
+            });
         });
     });
 
@@ -260,6 +290,38 @@ describe('File routes', () => {
                 expect(response.body).toEqual({
                     message: 'No file with id found.',
                 });
+            });
+            it('should return 404 when the user does not own the file', async () => {
+                //Arrange
+                const authuserA = await createAuthenticatedAgent();
+                const agentA = authuserA.agent;
+                const folderIdA = authuserA.rootFolderId;
+                createdEmails.push(authuserA.payload.email);
+                const csrfTokenA = authuserA.csrfToken;
+                const authuserB = await createAuthenticatedAgent();
+                const agentB = authuserB.agent;
+                const csrfTokenB = authuserB.csrfToken;
+                createdEmails.push(authuserB.payload.email);
+                //Act
+                await agentA
+                    .post('/api/files/create')
+                    .set('x-csrf-token', csrfTokenA)
+                    .field('folderId', folderIdA)
+                    .attach('file', filePath);
+
+                const infoResponse = await agentA.get(`/api/folders/${folderIdA}`);
+                const response = await agentB
+                    .delete(`/api/files/${infoResponse.body.files[0].id}`)
+                    .set('x-csrf-token', csrfTokenB);
+
+                //Assert
+                expect(response.status).toBe(404);
+                expect(response.body).toEqual({
+                    message: 'No file with id found.',
+                });
+
+                const responseAfter = await agentA.get(`/api/files/${infoResponse.body.files[0].id}`);
+                expect(responseAfter.status).toBe(200);
             });
         });
     });
