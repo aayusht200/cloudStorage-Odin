@@ -134,6 +134,7 @@ describe('createFile', () => {
             it('should pass the error to next', async () => {
                 // Arrange
                 const error = new Error('DB error');
+                const storageName = crypto.randomUUID();
                 req.file = {
                     mimetype: 'image/png',
                     originalname: 'testFileName',
@@ -145,7 +146,7 @@ describe('createFile', () => {
                 });
 
                 vi.mocked(uploadFile).mockResolvedValue({
-                    key: crypto.randomUUID(),
+                    key: storageName,
                 });
 
                 prisma.file.create.mockRejectedValue(error);
@@ -181,7 +182,8 @@ describe('createFile', () => {
                         },
                     }),
                 });
-
+                expect(deleteFile).toHaveBeenCalledWith(expect.any(String));
+                expect(deleteFile).toHaveBeenCalledWith(storageName);
                 expect(next).toHaveBeenCalledWith(error);
             });
         });

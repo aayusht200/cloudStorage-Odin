@@ -16,27 +16,39 @@ const createFile = async (req, res, next) => {
             });
         }
         const { key: storageName } = await uploadFile(req.file);
-        await prisma.file.create({
-            data: {
-                storageName,
-                mimeType: req.file.mimetype,
-                originalName: req.file.originalname,
-                fileSize: req.file.size,
-                uploadedBy: {
-                    connect: {
-                        id: req.user.id,
+        try {
+            await prisma.file.create({
+                data: {
+                    storageName,
+                    mimeType: req.file.mimetype,
+                    originalName: req.file.originalname,
+                    fileSize: req.file.size,
+                    uploadedBy: {
+                        connect: {
+                            id: req.user.id,
+                        },
+                    },
+                    folder: {
+                        connect: {
+                            id: folderId,
+                        },
                     },
                 },
-                folder: {
-                    connect: {
-                        id: folderId,
-                    },
-                },
-            },
-        });
-        return res.status(201).json({
-            message: 'File uploaded sucessfully',
-        });
+            });
+            return res.status(201).json({
+                message: 'File uploaded sucessfully',
+            });
+        } catch (originalError) {
+            try {
+                await deleteFile(storageName);
+            } catch (cleanupError) {
+                console.error('Failed to clean up uploaded file:', {
+                    storageName,
+                    error: cleanupError,
+                });
+            }
+            next(originalError);
+        }
     } catch (error) {
         next(error);
     }
