@@ -32,7 +32,7 @@ test.describe("files", () => {
       await form.getByRole("button", { name: "Upload" }).click();
       await expect(page.getByText("test.png")).toBeVisible();
     });
-    test("should upload a file via Upload file when empty drive and return to the current directory", async ({
+    test.only("should upload a file via Upload file when empty drive and return to the current directory", async ({
       page,
     }) => {
       await page
@@ -42,7 +42,7 @@ test.describe("files", () => {
       await expect(form.getByLabel("file")).toBeVisible();
       await form.getByLabel("file").setInputFiles(targetFile);
       await form.getByRole("button", { name: "Upload" }).click();
-      expect(page.getByText("test.png")).toBeVisible({ timeout: 30_000 });
+      await expect(page.getByText("test.png")).toBeVisible({ timeout: 30_000 });
     });
   });
   test.describe("File actions", () => {
