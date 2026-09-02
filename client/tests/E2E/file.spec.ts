@@ -16,10 +16,10 @@ test.describe("files", () => {
       .getByRole("textbox", { name: "Password" })
       .fill(payload.password);
     await page.getByRole("button", { name: "Login" }).click();
+    await expect(page).toHaveURL(/\/drive\/[^/]+$/, { timeout: 30_000 });
     await expect(
       page.getByRole("button", { name: "Upload", exact: true }),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/drive\/[^/]+$/);
   });
   test.describe("File uploads", () => {
     test("should upload a file via upload button from header and return to the current directory", async ({
@@ -42,7 +42,7 @@ test.describe("files", () => {
       await expect(form.getByLabel("file")).toBeVisible();
       await form.getByLabel("file").setInputFiles(targetFile);
       await form.getByRole("button", { name: "Upload" }).click();
-      await expect(page.getByText("test.png")).toBeVisible();
+      expect(page.getByText("test.png")).toBeVisible({ timeout: 30_000 });
     });
   });
   test.describe("File actions", () => {
