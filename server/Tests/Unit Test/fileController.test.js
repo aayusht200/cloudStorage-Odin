@@ -452,13 +452,13 @@ describe('deleteFileByID', () => {
                 expect(res.json).not.toHaveBeenCalled();
             });
         });
-
-        describe('when the database record is not deleted', () => {
-            it('should return 404', async () => {
+        describe('when the database deletion fails', () => {
+            it('should pass the database error to next', async () => {
                 // Arrange
+                const error = new Error('Db error');
                 deleteFile.mockResolvedValue(null);
                 prisma.file.findFirst.mockResolvedValue(fileInfo);
-                prisma.file.deleteMany.mockResolvedValue({ count: 0 });
+                prisma.file.deleteMany.mockRejectedValue(error);
                 // Act
                 await deleteFileByID(req, res, next);
                 // Assert
@@ -472,8 +472,7 @@ describe('deleteFileByID', () => {
                 expect(prisma.file.deleteMany).toHaveBeenCalledWith({
                     where: { id: req.params.id, userId: req.user.id },
                 });
-                expect(res.status).toHaveBeenCalledWith(404);
-                expect(res.json).toHaveBeenCalledWith({ message: 'File with id not found.' });
+                expect(next).toHaveBeenCalledWith(error);
             });
         });
 

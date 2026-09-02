@@ -88,11 +88,29 @@ const deleteFileByID = async (req, res, next) => {
         const fileInfo = await prisma.file.findFirst({ where: { id, userId: req.user.id } });
         if (!fileInfo) return res.status(404).json({ message: 'No file with id found.' });
         await deleteFile(fileInfo.storageName);
-        const deleteSuccess = await prisma.file.deleteMany({ where: { id, userId: req.user.id } });
-        if (deleteSuccess.count === 0) return res.status(404).json({ message: 'File with id not found.' });
-        return res.status(200).json({ message: 'File deleted sucessfully', id });
-    } catch (error) {
-        next(error);
+
+        try {
+            await prisma.file.deleteMany({
+                where: {
+                    id,
+                    userId: req.user.id,
+                },
+            });
+
+            return res.status(200).json({
+                message: 'File deleted sucessfully',
+                id,
+            });
+        } catch (dbError) {
+            console.error('Failed to delete file record from database:', {
+                key: fileInfo.storageName,
+                error: dbError,
+            });
+
+            next(dbError);
+        }
+    } catch (deletFileError) {
+        next(deletFileError);
     }
 };
 
