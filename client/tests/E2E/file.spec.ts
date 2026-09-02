@@ -16,10 +16,10 @@ test.describe("files", () => {
       .getByRole("textbox", { name: "Password" })
       .fill(payload.password);
     await page.getByRole("button", { name: "Login" }).click();
-    await expect(page).toHaveURL(/\/drive\/[^/]+$/);
     await expect(
       page.getByRole("button", { name: "Upload", exact: true }),
     ).toBeVisible();
+    await expect(page).toHaveURL(/\/drive\/[^/]+$/);
   });
   test.describe("File uploads", () => {
     test("should upload a file via upload button from header and return to the current directory", async ({
