@@ -1,0 +1,19 @@
+ALTER TABLE "Folder"
+DROP CONSTRAINT "Folder_parentId_fkey";
+
+ALTER TABLE "Folder"
+ADD CONSTRAINT "Folder_parentId_fkey"
+FOREIGN KEY ("parentId")
+REFERENCES "Folder"("id")
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE "File"
+DROP CONSTRAINT "File_folderId_fkey";
+
+ALTER TABLE "File"
+ADD CONSTRAINT "File_folderId_fkey"
+FOREIGN KEY ("folderId")
+REFERENCES "Folder"("id")
+ON DELETE CASCADE
+ON UPDATE CASCADE

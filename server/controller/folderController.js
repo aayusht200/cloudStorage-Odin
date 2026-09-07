@@ -1,4 +1,5 @@
 import prisma from '../config/Connection.js';
+import { deleteFolder } from '../service/deleteFolder.js';
 import { generatePath } from '../service/generatePath.js';
 const createFolder = async (req, res, next) => {
     const { folderName, parentId } = req.body;
@@ -60,10 +61,20 @@ const getFolderById = async (req, res, next) => {
 
 const deleteFolderId = async (req, res, next) => {
     const { id } = req.params;
+
     try {
-        const result = await prisma.folder.deleteMany({ where: { id, userId: req.user.id } });
-        if (result.count === 0) return res.status(404).json({ message: 'Folder with id not found' });
-        res.status(200).json({ message: 'Folder delete successfully' });
+        const result = await deleteFolder({
+            userID: req.user.id,
+            folderId: id,
+        });
+        if (!result) {
+            return res.status(404).json({
+                message: 'Folder with id not found',
+            });
+        }
+        return res.status(200).json({
+            message: 'Folder delete successfully',
+        });
     } catch (error) {
         next(error);
     }
