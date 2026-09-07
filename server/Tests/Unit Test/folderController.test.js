@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import prisma from '../../config/Connection.js';
 import { createFolder, deleteFolderId, getFolderById } from '../../controller/folderController';
+import { deleteFolder } from '../../service/deleteFolder.js';
 import { generatePath } from '../../service/generatePath';
 
 vi.mock('../../config/Connection.js', () => ({
@@ -8,11 +9,12 @@ vi.mock('../../config/Connection.js', () => ({
         folder: {
             create: vi.fn(),
             findFirst: vi.fn(),
-            deleteMany: vi.fn(),
         },
     },
 }));
-
+vi.mock('../../service/deleteFolder.js', () => ({
+    deleteFolder: vi.fn(),
+}));
 vi.mock('../../service/generatePath.js', () => ({
     generatePath: vi.fn(),
 }));
@@ -190,13 +192,12 @@ describe('folderController', () => {
             describe('when the folder does not exist', () => {
                 it('should return 404', async () => {
                     // Arrange
-                    prisma.folder.deleteMany.mockResolvedValue({ count: 0 });
+                    deleteFolder.mockResolvedValue(false);
+                    const { id } = req.params;
                     // Act
                     await deleteFolderId(req, res, next);
                     // Assert
-                    expect(prisma.folder.deleteMany).toHaveBeenCalledWith({
-                        where: { id: req.params.id, userId: req.user.id },
-                    });
+                    expect(deleteFolder).toHaveBeenCalledWith({ userID: req.user.id, folderId: id });
                     expect(res.status).toHaveBeenCalledWith(404);
                     expect(res.json).toHaveBeenCalledWith({ message: 'Folder with id not found' });
                     expect(next).not.toHaveBeenCalled();
@@ -207,13 +208,12 @@ describe('folderController', () => {
                 it('should pass the error to next', async () => {
                     // Arrange
                     const error = new Error('Folder delete failed');
-                    prisma.folder.deleteMany.mockRejectedValue(error);
+                    deleteFolder.mockRejectedValue(error);
+                    const { id } = req.params;
                     // Act
                     await deleteFolderId(req, res, next);
                     // Assert
-                    expect(prisma.folder.deleteMany).toHaveBeenCalledWith({
-                        where: { id: req.params.id, userId: req.user.id },
-                    });
+                    expect(deleteFolder).toHaveBeenCalledWith({ userID: req.user.id, folderId: id });
                     expect(res.status).not.toHaveBeenCalled();
                     expect(res.json).not.toHaveBeenCalled();
                     expect(next).toHaveBeenCalledWith(error);
@@ -224,7 +224,7 @@ describe('folderController', () => {
         describe('success', () => {
             it('should delete the folder and return 200', async () => {
                 // Arrange
-                prisma.folder.deleteMany.mockResolvedValue({});
+                deleteFolder.mockResolvedValue(true);
                 // Act
                 await deleteFolderId(req, res, next);
                 // Assert

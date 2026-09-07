@@ -32,7 +32,7 @@ test.describe("files", () => {
       await form.getByRole("button", { name: "Upload" }).click();
       await expect(page.getByText("test.png")).toBeVisible();
     });
-    test.only("should upload a file via Upload file when empty drive and return to the current directory", async ({
+    test("should upload a file via Upload file when empty drive and return to the current directory", async ({
       page,
     }) => {
       await page
