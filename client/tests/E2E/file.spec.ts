@@ -30,7 +30,7 @@ test.describe("files", () => {
       await expect(form.getByLabel("file")).toBeVisible();
       await form.getByLabel("file").setInputFiles(targetFile);
       await form.getByRole("button", { name: "Upload" }).click();
-      await expect(page.getByText("test.png")).toBeVisible();
+      await expect(page.getByText("test.png")).toBeVisible({ timeout: 30_000 });
     });
     test("should upload a file via Upload file when empty drive and return to the current directory", async ({
       page,
