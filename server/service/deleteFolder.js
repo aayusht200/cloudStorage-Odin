@@ -17,14 +17,13 @@ export const deleteFolder = async ({ userID, folderId }) => {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
             return false;
         }
+
         throw error;
     }
-    try {
-        await deleteFileList(fileList);
-        return true;
-    } catch (error) {
-        throw error;
-    }
+
+    await deleteFileList(fileList);
+
+    return true;
 };
 const getFolderDetails = async ({ userID, folderId }) => {
     try {
