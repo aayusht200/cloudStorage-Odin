@@ -2,121 +2,97 @@
 
 [![Main CI](https://github.com/aayusht200/cloudStorage-Odin/actions/workflows/main.yml/badge.svg)](https://github.com/aayusht200/cloudStorage-Odin/actions/workflows/main.yml)
 
-The client is a Vite React app for the Cloud Storage Odin drive UI. It handles authentication screens, protected drive routes, folder navigation, file upload forms, file previews, and theme switching.
+The client is a Vite React application for the Cloud Storage Odin browser UI. It owns authentication screens, protected drive navigation, folder and file views, uploads, previews, theme state, and the Axios API client.
+
+See the [root README](../README.md) for the complete project overview, environment variable reference, database/storage behavior, API table, and CI/deployment notes.
 
 ## Tech Stack
 
-- React 19, TypeScript, and React Router
-- Vite with the React Compiler preset
-- Tailwind CSS 4
-- Axios with credentialed requests and CSRF token headers for mutations
-- Base UI, shadcn-style primitives, Lucide, and Tabler icons
+- React, TypeScript, Vite, and React Router
+- React Hook Form and Zod for client-side form validation
+- Axios with credentialed requests and CSRF headers for mutations
+- Tailwind CSS, Base UI/shadcn-style primitives, Lucide, and Tabler icons
 - Vitest, Testing Library, jsdom, Playwright, and V8 coverage
 
 ## Setup
 
-Install dependencies from this directory:
+Dependencies are installed from the repository root through npm workspaces:
 
 ```bash
+cd ..
 npm ci
 ```
 
-Create `client/.env` and point the app at the API server:
+Create `client/.env`:
 
 ```env
 VITE_API_URL=http://localhost:3000
 ```
 
-The backend must also be running. See [../server/README.md](../server/README.md).
-
-## Development
+Run the server in a separate terminal, then start the client:
 
 ```bash
 npm run dev
 ```
 
-Vite prints the local URL when it starts. The usual development URL is `http://localhost:5173`.
-
-## Scripts
-
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start the Vite development server |
-| `npm run build` | Type-check and create a production build |
-| `npm run lint` | Run ESLint |
-| `npm run typecheck` | Run the TypeScript project check |
-| `npm run preview` | Preview the production build locally |
-| `npm test` | Run frontend Vitest tests |
-| `npm test -- --coverage --run` | Run frontend tests with V8 coverage |
-| `npm run test:e2e` | Run Playwright E2E tests |
-
-The production build is written to `client/dist/`.
+Vite normally serves the client at `http://localhost:5173`.
 
 ## Routes
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Redirect based on auth state |
+| `/` | Redirect to the user’s root drive or `/login` |
 | `/login` | Login form |
 | `/signup` | Signup form |
 | `/drive/:id` | Folder contents |
 | `/upload/:id` | Upload a file to a folder |
-| `/file/:id` | File preview/details |
+| `/file/:id` | File metadata and preview |
 | `/:id/createfolder` | Create a child folder |
+
+`rootLoader` loads the current session. Auth redirect, drive, and file loaders handle protected navigation and redirect unauthenticated users to `/login`. Services in `src/service` call the server API through the shared Axios instance with `withCredentials: true`.
+
+After login or session hydration, the client stores the server-provided CSRF token in memory. The Axios request interceptor sends it as `x-csrf-token` for `POST`, `PUT`, `PATCH`, and `DELETE` requests.
+
+## Scripts
+
+Run these from `client/`, or prefix them with `npm --workspace client` from the repository root.
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Vite development server |
+| `npm run build` | Type-check and create the production build in `dist/` |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run the TypeScript project check |
+| `npm run preview` | Preview the production build locally |
+| `npm test` | Run Vitest in watch mode |
+| `npm test -- --run` | Run Vitest once |
+| `npm test -- --coverage --run` | Run Vitest once with V8 coverage |
+| `npm run test:e2e` | Run Playwright E2E tests |
 
 ## Testing
 
-Frontend tests are organized under `client/tests`. Vitest `.test.*` files cover schemas, helpers, services, loaders, pages, and UserProvider behavior. Playwright `.spec.ts` files live under `client/tests/E2E` and cover end-to-end browser workflows.
+Vitest tests are under `client/tests` and use the `.test.*` naming convention. They cover:
 
-| Area | Covered |
-| --- | --- |
-| Pages | `Login`, `SignupPage`, `DrivePage`, `FilesPage`, `UploadPage`, `CreateFolderPage`, `HomeRedirect`, `ErrorPage` |
-| Context | `UserProvider` behavior |
-| Zod schemas | `authSchema`, `fileSchema`, `folderSchema` |
-| Helper functions | `getFileIcon` |
-| API services | `authenticate`, `createFolder`, `deleteFile`, `deleteFolder`, `getFile`, `getFolder`, `login`, `logout`, `signup`, `upload` |
-| React Router loaders | `authRedirectLoader`, `driveLoader`, `filesLoader`, `rootLoader` |
+- Pages: login, signup, drive, file preview, upload, folder creation, home redirect, and error handling
+- `UserProvider` behavior
+- Client Zod schemas, file-icon helpers, API services, and React Router loaders
 
-The Vitest tests use Testing Library, jsdom, V8 coverage, Axios/service mocking, and React Router dependency mocking.
-Service tests include the shared Axios client behavior that stores CSRF tokens from auth responses and sends `x-csrf-token` on state-changing requests.
+The current local run passes 27 Vitest files and 100 tests:
 
-Latest verified Vitest result:
+```bash
+npm test -- --run
+```
 
-| Metric | Coverage |
-| --- | --- |
-| Test files | 27 passed |
-| Tests | 100 passed |
-| Statements | 85.05% |
-| Branches | 83.67% |
-| Functions | 75.65% |
-| Lines | 85.25% |
+Playwright tests are under `client/tests/E2E` and currently list 16 tests across seven files. They cover signup/login/logout, theme switching and persistence, folder creation/navigation/deletion, file upload/details/deletion, and signed-link copying.
 
-Loaders, schemas, and helpers report 100% coverage in the latest coverage run. Pages are effectively covered at 98.93% statements, and service coverage is 95.34% statements after the CSRF token handling update. Overall frontend coverage is lower because UI infrastructure, third-party-derived UI primitives, and some context/provider branches remain partially uncovered.
+```bash
+npm run test:e2e
+```
 
-Latest verified Playwright result:
-
-| Metric | Result |
-| --- | --- |
-| E2E tests | 16 passed |
-
-Playwright covers the home page, signup, login, logout, theme switching and persistence, system light/dark behavior, folder creation, folder navigation, folder deletion, file upload, file details, share-link copying, and file deletion. The E2E suite requires the frontend dev server, backend API, database, S3-compatible storage, and the existing upload fixture used by the tests.
-
-GitHub Actions runs the client lint, Vitest tests, typecheck, production build, and Playwright E2E suite as part of the repository `Main CI` workflow.
-
-### Testing Roadmap
-
-Completed:
-
-- Backend unit tests
-- Backend integration tests
-- Frontend tests for pages, UserProvider behavior, schemas, helpers, services, and loaders
-- Playwright E2E tests for core browser workflows
-- GitHub Actions CI for linting, tests, typecheck, build, and E2E checks
-
-Next:
-
-- Maintain coverage as new frontend features are added
+The E2E config starts the Vite server, but the API must already be running at `http://localhost:3000`. The database, S3-compatible storage, and the committed `client/tests/E2E/test.png` fixture are also required for the full workflow suite.
 
 ## Deployment
 
-The client is deployed on Vercel. The project includes `vercel.json` with a rewrite to `index.html` so browser refreshes work on client-side routes and an `/api/:path*` rewrite to the Render backend. Set `VITE_API_URL` in the deployment environment to the production API URL.
+The frontend production target is Vercel. The root `vercel.json` provides the SPA fallback to `/index.html` and rewrites `/api/:path*` to the Render API at `https://cloudstorage-odin.onrender.com/api/:path*`. Set `VITE_API_URL` in the Vercel project environment to the API URL used by the client.
+
+The Vercel project configuration itself is external to this repository; the repository does not contain a separate client deployment script.

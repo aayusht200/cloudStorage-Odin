@@ -10,12 +10,11 @@
         "type": "git",
         "url": "git+https://github.com/aayusht200/cloudStorage-Odin.git"
     },
-    "license": "ISC",
-    "author": "",
+    "license": "MIT",
+    "author": "aayush trivedi",
     "type": "module",
     "main": "index.js",
     "scripts": {
-        "test": "vitest",
         "coverage-server": "npm --workspace server test -- --coverage",
         "test-ui-server": "npx --workspace server vitest --ui",
         "coverage-client": "npm --workspace client test -- --coverage",

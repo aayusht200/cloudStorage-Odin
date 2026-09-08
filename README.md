@@ -11,7 +11,7 @@
 ![AWS S3 Compatible Storage](https://img.shields.io/badge/S3%20Compatible%20Storage-AWS%20SDK%203.1095.0-FF9900?style=flat-square&logo=amazons3&logoColor=fff)
 [![Main CI](https://github.com/aayusht200/cloudStorage-Odin/actions/workflows/main.yml/badge.svg)](https://github.com/aayusht200/cloudStorage-Odin/actions/workflows/main.yml)
 
-Cloud Storage Odin is a full-stack cloud storage app for managing personal files and folders in a browser. It supports account-based access, nested folders, file uploads, inline previews for supported media, and signed links for stored files.
+Cloud Storage Odin is a full-stack browser application for managing personal files and nested folders. Users can create accounts, browse folders, upload supported files, preview media, copy signed file links, and delete files or folders.
 
 ## Live Demo
 
@@ -23,345 +23,211 @@ https://cloud-storage-odin-client-rose.vercel.app
 
 https://github.com/aayusht200/cloudStorage-Odin
 
----
-
-## Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Screenshots](#screenshots)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Backend Overview](#backend-overview)
-- [Testing](#testing)
-- [Deployment](#deployment)
-- [Challenges](#challenges)
-- [Current Project Status](#current-project-status)
-- [Future Improvements](#future-improvements)
-- [License](#license)
-
----
-
 ## Features
 
-- User registration, login, and logout
-- Session-based authentication with Passport.js
-- Protected frontend routes with React Router loaders
-- Folder creation, deletion, and navigation
-- Breadcrumb navigation
-- File upload to S3-compatible object storage
-- File preview for images, PDFs, audio, and video
-- File metadata display
-- Signed file URL copy/share action
-- File deletion
-- Download fallback for files without inline preview support
-- Schema-driven form and request validation with Zod
+- Account registration, login, logout, and session-based authentication
+- Protected React Router views for drive, folder, and file data
+- Nested folder creation, navigation, and deletion
+- File upload, metadata display, inline previews, signed links, and deletion
+- Light, dark, and system theme modes
+- Zod validation on client forms and server request boundaries
 - CSRF protection for authenticated state-changing API requests
-- Unit and integration tested backend controllers, routes, validation middleware, and Zod schemas with Vitest and Supertest
-- Tested frontend pages, context, schemas, helpers, API services, and React Router loaders with Vitest
-- End-to-end browser coverage for auth, theme, folder, and file workflows with Playwright
-- Light, dark, and system theme toggle
-- Responsive drive grid and form layouts
+- Unit, component, integration, and browser E2E test coverage
 
 ## Tech Stack
 
 | Area | Technologies |
 | --- | --- |
-| Frontend | React, TypeScript, Vite, React Router, React Hook Form, Tailwind CSS, Base UI, Axios, Zod |
-| Backend | Node.js, Express, Passport.js, Express Session, connect-pg-simple, Multer, Zod, bcrypt, CORS, CSRF middleware |
+| Frontend | React, TypeScript, Vite, React Router, React Hook Form, Tailwind CSS, Axios, Zod |
+| Backend | Node.js 24, Express, Passport Local, Express Session, bcrypt, Multer, Zod, CORS |
 | Database | PostgreSQL, Prisma, `pg`, `connect-pg-simple` |
-| Storage | AWS SDK for S3-compatible object storage |
-| Testing | Vitest, Supertest, Testing Library, jsdom, Playwright, V8 coverage |
-| Tooling | ESLint, Prettier, Nodemon, Prisma CLI |
+| File storage | AWS SDK for S3-compatible object storage |
+| Testing | Vitest, Testing Library, jsdom, Supertest, Playwright, V8 coverage |
+| Tooling | ESLint, Nodemon, Prisma CLI, npm workspaces |
 
 ## Project Structure
 
 ```text
 cloudStorage-Odin/
-├── client/   # Vite React app, routes, loaders, UI components, contexts, and API services
-└── server/   # Express API, controllers, routes, Prisma schema, auth, sessions, and storage logic
+├── client/                         # Vite React application
+│   ├── src/pages/                  # Auth, drive, folder, upload, and file views
+│   ├── src/loaders/                # React Router data and auth loaders
+│   ├── src/service/                # Axios API client and request services
+│   ├── src/schema/                 # Client-side Zod schemas and types
+│   └── tests/                      # Vitest and Playwright tests
+├── server/                         # Express API
+│   ├── routes/                     # User, folder, and file routers
+│   ├── controller/                 # HTTP request handlers
+│   ├── middleware/                 # Auth, CSRF, and Zod validation
+│   ├── service/                    # Storage and folder path/deletion helpers
+│   ├── config/                     # PostgreSQL, Passport, Multer, and S3 setup
+│   ├── prisma/                     # Schema and migrations
+│   └── Tests/                      # Unit and Supertest integration tests
+├── .github/workflows/main.yml      # CI workflow
+└── vercel.json                     # Vercel rewrites for the SPA and API
 ```
 
-- `client/src/pages`: route-level screens for authentication, drive browsing, uploads, folder creation, loading, and errors.
-- `client/src/components`: reusable UI elements used across the drive and auth flows.
-- `client/src/service`: Axios API client and request helpers for auth, folders, files, upload, deletion, and CSRF token handling.
-- `client/src/loaders`: React Router loaders for authentication redirects and drive/file data fetching.
-- `client/src/schema`: Zod schemas and inferred payload types used for form validation and service contracts.
-- `client/tests`: Vitest `.test.*` tests for pages, context, schemas, helpers, API services, and React Router loaders, plus Playwright `.spec.ts` E2E tests under `client/tests/E2E`.
-- `server/routes`: Express routers for user, folder, and file endpoints.
-- `server/controller`: request handlers for authentication, folder operations, and file operations.
-- `server/schema`: Zod schemas used by reusable validation middleware for request bodies, route parameters, and uploaded files.
-- `server/middleware`: authentication middleware, CSRF verification, and reusable Zod request validation before controllers execute.
-- `server/config`: database, session, Passport, Multer, and S3-compatible storage configuration.
-- `server/service`: storage helpers for upload, deletion, signed URLs, and path generation.
-- `server/prisma`: Prisma schema and migrations for users, folders, and files.
-- `server/Tests`: Vitest unit and Supertest integration tests for backend schemas, middleware, controllers, and routes, with integration fixtures for users, folders, files, and uploaded objects.
-
-## Screenshots
-
-### Login
-
-![Login form with email and password fields](screenshot/login.png)
-
-### Signup
-
-![Signup form with name, email, and password fields](screenshot/signup.png)
-
-### Drive
-
-![Drive dashboard showing a folder and uploaded image files](screenshot/home.png)
-
-### Folder Creation
-
-![Create folder form for adding a folder in the root directory](screenshot/folderCreation.png)
-
-### File Upload
-
-![Upload form for choosing and submitting a file](screenshot/fileUpload.png)
-
-### Empty Drive
-
-![Empty drive state with an upload prompt](screenshot/emptyDrive.png)
+The client owns the browser UI, route loaders, form validation, theme state, and API calls. The server owns authentication, session persistence, authorization, request validation, folder/file metadata, database access, and object storage operations.
 
 ## Getting Started
 
-1. Clone the repository.
+The repository uses npm workspaces and a root `package-lock.json`. From the repository root:
 
 ```bash
 git clone git@github.com:aayusht200/cloudStorage-Odin.git
 cd cloudStorage-Odin
+npm ci
 ```
 
-2. Install frontend dependencies.
+The root package declares Node `24.x` and npm `11.x` engines.
+
+Create the environment files described in [Environment Variables](#environment-variables), then run the two applications in separate terminals:
 
 ```bash
-cd client
-npm install
+npm --workspace server run dev
+npm --workspace client run dev
 ```
 
-3. Install backend dependencies.
+The default local URLs are `http://localhost:3000` for the API and `http://localhost:5173` for the Vite client. The server must have a reachable PostgreSQL database and S3-compatible storage before authenticated, database-backed, upload, integration, or E2E flows can work.
 
-```bash
-cd ../server
-npm install
-```
+### Workspace Scripts
 
-4. Configure environment variables.
-
-Create `.env` files in `client/` and `server/` with the variables listed below.
-
-5. Run the frontend.
-
-```bash
-cd client
-npm run dev
-```
-
-6. Run the backend.
-
-```bash
-cd server
-npm run dev
-```
-
-### Available Scripts
-
-| Directory | Script | Purpose |
+| Workspace | Command | Purpose |
 | --- | --- | --- |
-| `client` | `npm run dev` | Start the Vite development server |
-| `client` | `npm run build` | Build the production frontend |
-| `client` | `npm run lint` | Run ESLint |
-| `client` | `npm run typecheck` | Run the TypeScript project check |
-| `client` | `npm run preview` | Preview the production frontend build |
-| `client` | `npm test` | Run Vitest |
-| `client` | `npm test -- --coverage --run` | Run frontend tests with V8 coverage |
-| `client` | `npm run test:e2e` | Run Playwright E2E tests |
-| `server` | `npm run dev` | Start the API with Nodemon |
-| `server` | `npm start` | Start the API with Node |
-| `server` | `npm run generate` | Generate the Prisma client |
-| `server` | `npm run lint` | Run ESLint |
-| `server` | `npm test` | Run backend Vitest tests |
-| `server` | `npm run coverage` | Run backend tests with V8 coverage |
-| root | `npm test` | Run workspace Vitest tests |
-| root | `npm run coverage-client` | Run frontend coverage from the workspace root |
-| root | `npm run coverage-server` | Run backend coverage from the workspace root |
-| root | `npm run test-ui-client` | Open the Vitest UI for the client workspace |
-| root | `npm run test-ui-server` | Open the Vitest UI for the server workspace |
+| client | `npm --workspace client run dev` | Start the Vite development server |
+| client | `npm --workspace client run build` | Type-check and build the frontend |
+| client | `npm --workspace client run lint` | Run client ESLint |
+| client | `npm --workspace client run typecheck` | Run the TypeScript project check |
+| client | `npm --workspace client run preview` | Preview the production build |
+| client | `npm --workspace client run test -- --run` | Run client Vitest tests once |
+| client | `npm --workspace client run test -- --coverage --run` | Run client tests with V8 coverage |
+| client | `npm --workspace client run test:e2e` | Run Playwright browser tests |
+| server | `npm --workspace server run dev` | Start the API with Nodemon |
+| server | `npm --workspace server start` | Start the API with Node |
+| server | `npm --workspace server run generate` | Generate the Prisma client |
+| server | `npm --workspace server run lint` | Run server ESLint |
+| server | `npm --workspace server run test -- --run "Tests/Unit Test"` | Run server unit tests |
+| server | `npm --workspace server run test -- --run "Tests/Integration"` | Run server integration tests |
+| server | `npm --workspace server run coverage` | Run the server suite with V8 coverage |
 
-The latest verified frontend automation reports 116 passing tests: 100 Vitest unit/component tests and 16 Playwright E2E tests. The backend suite contains 143 Vitest/Supertest tests across 11 files.
+The root package also defines `npm test`, `npm run coverage-client`, `npm run coverage-server`, `npm run test-ui-client`, and `npm run test-ui-server`. These are not a single CI aggregate: `npm test` invokes Vitest from the repository root, while the CI workflow uses the explicit workspace commands above.
 
 ## Environment Variables
 
-### Frontend
+The names below are taken from `client/.env.example`, `server/.env.example`, and the application code. Do not commit populated `.env` files.
 
-```text
-VITE_API_URL
+### Client (`client/.env`)
+
+```env
+VITE_API_URL=http://localhost:3000
 ```
 
-### Backend
+`VITE_API_URL` is the Axios base URL for the Express API.
 
-```text
-PORT
-SESSION_SECRET
-NODE_ENV
-DATABASE_URL
-S3_REGION
-S3_ENDPOINT
-S3_ACCESS_KEY_ID
-S3_SECRET_ACCESS_KEY
-S3_BUCKET_NAME
+### Server (`server/.env`)
+
+```env
+PORT=3000
+NODE_ENV=development
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?schema=public"
+SESSION_SECRET="replace-with-a-long-random-string"
+S3_REGION="your-region"
+S3_ENDPOINT="https://your-s3-compatible-endpoint"
+S3_ACCESS_KEY_ID="your-access-key"
+S3_SECRET_ACCESS_KEY="your-secret-key"
+S3_BUCKET_NAME="your-bucket"
 ```
 
-## Backend Overview
+`PORT` defaults to `3000` when it is not set. `DATABASE_URL` is used by Prisma and the PostgreSQL session pool. `NODE_ENV=production` enables production cookie and PostgreSQL SSL settings. CSRF tokens are generated per session; there is no CSRF environment variable.
 
-### Authentication Flow
+## API Overview
 
-The API uses `express-session` with a PostgreSQL-backed session store and Passport local authentication. Signup validates the request body, checks for an existing user, hashes the password with bcrypt, and creates the user plus a root folder in a Prisma transaction. Login validates credentials through Passport, stores the authenticated user id and CSRF token in the session, and saves the session before responding. Protected routes use `requireAuth`, and logout destroys the session before clearing the `connect.sid` cookie.
-
-### Security Overview
-
-Authenticated sessions are stored in PostgreSQL through `connect-pg-simple`. Production cookies use `secure: true` and `sameSite: "none"` for the cross-origin Vercel to Render flow. The API allows credentialed CORS requests from local frontend ports and matching deployed Vercel frontend URLs. Authenticated state-changing routes require the session CSRF token in the `x-csrf-token` header before controllers execute. Stored files remain in S3-compatible private storage and are accessed through signed URLs.
-
-### API Overview
+The API is mounted under `/api`. Protected routes require the authenticated session. Authenticated state-changing routes also require the session CSRF token in the `x-csrf-token` header.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `POST` | `/api/users/signup` | Create an account |
-| `POST` | `/api/users/login` | Login with Passport and return a CSRF token |
-| `POST` | `/api/users/logout` | Logout the current session; requires CSRF token |
+| `GET` | `/health` | Return `{ "status": "ok" }` for health checks |
+| `POST` | `/api/users/signup` | Validate and create a user plus root folder |
+| `POST` | `/api/users/login` | Authenticate with Passport and return a CSRF token |
+| `POST` | `/api/users/logout` | Destroy the authenticated session |
 | `GET` | `/api/users/me` | Return the current user, root folder id, and CSRF token |
-| `POST` | `/api/folders/create` | Create a folder; requires CSRF token |
-| `GET` | `/api/folders/:id` | Get a folder, its children, files, and path |
-| `DELETE` | `/api/folders/:id` | Delete a folder; requires CSRF token |
-| `POST` | `/api/files/create` | Upload a file; requires CSRF token |
-| `GET` | `/api/files/:id` | Get file metadata, path, and a signed URL |
-| `DELETE` | `/api/files/:id` | Delete a file; requires CSRF token |
+| `POST` | `/api/folders/create` | Create a child folder |
+| `GET` | `/api/folders/:id` | Return folder contents and its path |
+| `DELETE` | `/api/folders/:id` | Delete a folder recursively |
+| `POST` | `/api/files/create` | Upload a file to a folder |
+| `GET` | `/api/files/:id` | Return file metadata, path, and a signed URL |
+| `DELETE` | `/api/files/:id` | Delete a file |
 
-### Database Overview
+## Authentication, Validation, and CSRF
 
-Prisma models users, folders, and files in PostgreSQL. Users have a unique email, role, hashed password, folders, and files. Folders belong to users, support parent-child nesting, and enforce unique folder names per user and parent folder. Files belong to both a user and folder, store original metadata, and use a unique storage object name.
+The server uses Passport Local with bcrypt and `express-session`. Sessions are stored in PostgreSQL through `connect-pg-simple`, while only the user id is serialized into the session. Signup creates the user and their `root` folder in one Prisma transaction. Production cookies are HTTP-only, secure, and configured with `sameSite: "none"` for the deployed cross-origin client/API arrangement.
 
-### Storage Overview
+Login creates a random CSRF token in the session and returns it in the response. `/api/users/me` returns the same token when the session is reloaded. The client stores the token in memory and the shared Axios request interceptor sends it on `POST`, `PUT`, `PATCH`, and `DELETE` requests. The server checks it before authenticated mutations and returns `403` when it is missing or does not match.
 
-Uploads are parsed in memory with Multer, limited to 10 MB, and stored through the AWS SDK S3 client against an S3-compatible endpoint. Stored objects use generated UUID keys. File reads return signed URLs that expire after one hour, and deletes remove the object before deleting database metadata.
+Zod schemas validate auth bodies, folder bodies, UUID route parameters, and uploaded file objects. Invalid input returns `400` with flattened validation errors. Ownership checks are applied when reading or modifying user folders and files.
 
-### Validation Strategy
+## Database and Storage
 
-Zod schemas validate auth payloads, folder creation payloads, route ids, and uploaded file objects. The reusable `validate` middleware parses `body`, `params`, or `file`, replaces the request target with parsed data, and returns `400` with flattened Zod errors when validation fails. CSRF verification runs on authenticated state-changing routes before controller logic. File uploads are also filtered by Multer before controller logic runs.
+Prisma models `User`, `Folder`, and `File` in PostgreSQL. Users have unique email addresses. Folders support a per-user parent/child hierarchy and enforce unique names within a user and parent folder. Files store their original name, MIME type, size, owner, folder, and a unique `storageName` object key.
 
-### Error Handling
+Apply the committed migrations to a database with:
 
-Controllers return explicit client errors for expected cases such as duplicate users, duplicate folders, missing folders, missing files, invalid folder ids, unauthenticated requests, and validation failures. Unexpected errors are passed to the centralized Express error handler, which returns the error status when present or `500`.
+```bash
+npx prisma migrate deploy
+```
+
+For local schema development, create a named migration and regenerate the client:
+
+```bash
+npx prisma migrate dev --name <migration-name>
+npm --workspace server run generate
+```
+
+Uploads are held in Multer memory storage, limited to 10 MiB, and sent to the configured S3-compatible bucket with a generated UUID key. The database row is created after the object upload; if row creation fails, the server makes a best-effort object cleanup. Reads return one-hour signed URLs.
+
+Deleting a file removes its object first and then its database row. Deleting a folder first collects storage keys for the folder and all descendants, then deletes the folder row. PostgreSQL `ON DELETE CASCADE` foreign keys recursively remove descendant folder rows and their file metadata rows. The collected objects are then deleted from S3-compatible storage in bulk. Database cascade deletion and object cleanup are separate operations, so storage cleanup failures can leave orphaned objects.
 
 ## Testing
 
-### Backend Testing
+### Client
 
-Backend tests use Vitest, Supertest, and V8 coverage in a Node environment. Tests are organized under `server/Tests`, with unit tests under `server/Tests/Unit Test` and HTTP integration tests under `server/Tests/Integration`.
-
-| Test type | Current coverage |
-| --- | --- |
-| Unit tests | Controllers, CSRF middleware, validation middleware, and Zod schemas |
-| Integration tests | User routes, login/session behavior, logout/session destruction, folder routes, file routes, authentication failures, validation failures, file upload/delete behavior, and database-backed request flows |
-
-Controller unit tests mock Prisma, bcrypt, Passport, request/session methods, response helpers, and storage helpers where appropriate. Middleware tests exercise CSRF checks plus body, params, and file validation. Schema tests cover valid and invalid input, boundary conditions, UUID validation, file upload schema validation, MIME types, password complexity, and email validation.
-
-Supertest is used for HTTP integration testing. Tests use `request.agent(app)` where session and cookie persistence is required across login, authenticated requests, and logout. Backend integration tests now create their own required users, folders, files, and uploaded S3-compatible storage objects where needed, then clean up test data afterward instead of depending on manually persisted development database records.
-
-Latest verified backend result:
-
-| Metric | Result |
-| --- | --- |
-| Test files | 11 passed |
-| Tests | 143 passed |
-| Statements | 95.13% |
-| Branches | 80% |
-| Functions | 90.62% |
-| Lines | 94.88% |
-
-The backend integration suite still requires a configured and reachable test/development database, a configured and reachable S3-compatible storage environment, and the existing upload fixture file used by the file route tests.
-
-### Frontend Testing
-
-Frontend unit and component tests use Vitest, Testing Library, jsdom, service mocking, React Router dependency mocking, and V8 coverage. Vitest tests use the `.test.*` naming convention and cover pages, context, Zod schemas, helper functions, API services, and React Router loaders.
-
-| Area | Covered |
-| --- | --- |
-| Pages | Login, signup, drive, file preview, upload, folder creation, home redirect, and error pages |
-| Context | UserProvider behavior |
-| Zod schemas | Auth, file, and folder schemas |
-| Helper functions | `getFileIcon` |
-| API services | `authenticate`, `createFolder`, `deleteFile`, `deleteFolder`, `getFile`, `getFolder`, `login`, `logout`, `signup`, `upload` |
-| React Router loaders | `authRedirectLoader`, `driveLoader`, `filesLoader`, `rootLoader` |
-
-Verified Vitest command:
+Client Vitest tests cover pages, `UserProvider`, schemas, helpers, API services, and React Router loaders. The current suite contains 27 test files and 100 tests. Playwright is configured for `client/tests/E2E` and currently lists 16 tests across seven files covering auth, theme, folders, file upload, file details, signed-link copying, and deletion.
 
 ```bash
-npm run coverage-client -- --run
+npm --workspace client run test -- --run
+npm --workspace client run test:e2e
 ```
 
-Latest verified frontend result:
+The Playwright suite starts the Vite server through its config, but the API must already be available at `http://localhost:3000`; the database and S3-compatible storage must also be configured.
 
-| Metric | Coverage |
-| --- | --- |
-| Test files | 27 passed |
-| Tests | 100 passed |
-| Statements | 85.05% |
-| Branches | 83.67% |
-| Functions | 75.65% |
-| Lines | 85.25% |
+### Server
 
-Loaders, schemas, and helpers report 100% coverage in the latest frontend coverage run. Pages are effectively covered at 98.93% statements, and service coverage is 95.34% statements after the CSRF token handling update. Remaining uncovered code is primarily UI infrastructure, third-party-derived UI primitives, and partial context/provider branches rather than missing application workflows.
-
-Playwright E2E tests live under `client/tests/E2E` and use the `.spec.ts` naming convention. The current E2E suite has 16 passing browser tests covering the home page, signup, login, logout, theme switching and persistence, system light/dark behavior, folder creation/navigation/deletion, file upload, file details, share-link copying, and file deletion.
+Server unit tests cover controllers, the folder deletion service, CSRF middleware, validation middleware, and Zod schemas. The current unit suite contains nine files and 111 tests. Supertest integration tests cover user, folder, and file routes in three files; they create database/storage fixtures and require the configured integration environment.
 
 ```bash
-cd client
-npm run test:e2e
+npm --workspace server run test -- --run "Tests/Unit Test"
+npm --workspace server run test -- --run "Tests/Integration"
 ```
 
-GitHub Actions runs the full project check on push, pull request, and manual dispatch: client lint, Vitest tests, typecheck, build, Prisma client generation, database migrations, server lint, server unit and integration tests, and Playwright E2E tests.
+The latest verified integration run passes all three route suites: `userRoutes.test.js` (11 tests), `folderRoute.test.js` (14 tests), and `fileRoute.test.js` (15 tests), for 40 passing tests total. The folder suite includes verification that deleting a parent folder also deletes its child folder. Integration tests require the configured PostgreSQL database, S3-compatible storage, and committed file fixtures.
 
-## Deployment
+## CI/CD and Deployment
 
-| Layer | Production Service |
-| --- | --- |
-| Frontend | Vercel |
-| Backend | Render |
-| Database | Supabase PostgreSQL |
-| File storage | S3-compatible object storage |
+`.github/workflows/main.yml` runs on pushes, pull requests, and manual dispatches using Node 24. It installs from the root lockfile, installs Chromium for Playwright, runs client lint/tests/typecheck/build, generates Prisma, applies deployed migrations, runs server lint/unit/integration tests, starts the API, waits for `/health`, and runs the Playwright suite with one worker. Database, session, storage, and client API configuration are supplied through GitHub Actions secrets/variables.
 
-GitHub Actions provides CI checks. CD is handled by the connected hosting platforms: the client deploys on Vercel and the server deploys on Render from the main branch.
+The current production targets are Vercel for the frontend and Render for the backend. The repository contains `vercel.json`, which rewrites `/api/:path*` to `https://cloudstorage-odin.onrender.com/api/:path*` and all other paths to `/index.html` for client-side routing. No Render configuration file or deployment step is present in this repository; hosting-project settings are external to the codebase.
 
-The root `vercel.json` routes `/api/:path*` requests to the Render backend and rewrites other requests to `index.html` for client-side routing.
-Incoming API payloads are validated with Zod middleware before reaching controllers.
-Authenticated state-changing API requests are also checked by CSRF middleware before reaching controllers.
+## Screenshots
 
-## Challenges
-
-- Maintaining session-based authentication across a separate frontend and backend.
-- Persisting sessions in PostgreSQL while supporting production cookie settings.
-- Modeling folders and files so users can navigate a nested folder hierarchy.
-- Uploading files through the API and storing them in S3-compatible object storage.
-- Generating signed URLs for file preview and copy/share actions.
-- Using React Router loaders for route protection, redirects, and drive data fetching.
-- Configuring credentialed CORS between local development and deployed Vercel frontend URLs.
-- Supporting SPA routing on Vercel with an `index.html` rewrite.
-
-## Current Project Status
-
-The project has a working full-stack implementation with session authentication, CSRF-protected mutations, nested folders, file upload and deletion, signed file URLs, Zod validation, Prisma migrations, backend unit/integration tests, frontend unit/component tests, Playwright E2E tests, GitHub Actions CI, and platform-managed CD through Vercel and Render.
+![Login](screenshot/login.png)
+![Signup](screenshot/signup.png)
+![Folder creation](screenshot/folderCreation.png)
+![File upload](screenshot/fileUpload.png)
+![Empty drive](screenshot/emptyDrive.png)
 
 ## Future Improvements
 
-- Multiple file upload
-- Drag-and-drop uploads
-- File and folder rename support
-- Search across files and folders
-- Dedicated download action for all file types
-- Maintain and expand tests as new UI and API features are added
-- Improved empty states and loading states
+Multiple-file uploads, drag-and-drop uploads, rename support, search, and a dedicated download action for all file types remain possible next steps.
 
 ## License
 
