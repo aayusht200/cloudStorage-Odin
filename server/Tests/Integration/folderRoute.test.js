@@ -176,17 +176,27 @@ describe('Folder routes', () => {
             it('should delete the folder', async () => {
                 // Arrange
                 await authenticate();
-                const createResponse = await agent
+                const parentFolder = await agent
                     .post('/api/folders/create')
                     .set('x-csrf-token', csrfToken)
                     .send(payload);
+                const childFolder = await agent
+                    .post('/api/folders/create')
+                    .set('x-csrf-token', csrfToken)
+                    .send({
+                        folderName: `Test Folder ${crypto.randomUUID()}`,
+                        parentId: parentFolder.body.id,
+                    });
                 // Act
                 const deleteResponse = await agent
-                    .delete(`/api/folders/${createResponse.body.id}`)
+                    .delete(`/api/folders/${parentFolder.body.id}`)
                     .set('x-csrf-token', csrfToken);
+                const getChild = await agent.get(`/api/folders/${childFolder.body.id}`);
                 // Assert
                 expect(deleteResponse.status).toBe(200);
                 expect(deleteResponse.body).toEqual({ message: 'Folder delete successfully' });
+                expect(getChild.status).toBe(404);
+                expect(getChild.body).toEqual({ message: 'Folder with id not found' });
             });
         });
 
